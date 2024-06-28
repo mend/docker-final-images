@@ -1,6 +1,4 @@
-ARG RELEASE
-
-FROM mend/base-repo-controller:${RELEASE}
+FROM mend/base-repo-controller:24.6.1
 
 # copy folder
 COPY docker-image/ /

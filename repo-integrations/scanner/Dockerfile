@@ -1,6 +1,4 @@
-ARG RELEASE
-
-FROM mend/base-repo-scanner:${RELEASE}
+FROM mend/base-repo-scanner:24.6.1
 
 ## Uncomment the below to enable Dynamic package manager install for selected package managers
 ##
