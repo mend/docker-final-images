@@ -9,16 +9,16 @@ FROM mend/base-repo-scanner:24.6.1
 
 # Download the pre-scan builder and set it in $PATH, can be replaced by:
 #--build-arg $PSB_URL=URL
-RUN echo "Downloading PSB version 24.5.1"
-ARG PSB_URL=https://wss-public.s3.amazonaws.com/pre-scan-builder/production/24.5.1/linux_amd64/psb
+RUN echo "Downloading PSB version 24.6.1"
+ARG PSB_URL=https://wss-public.s3.amazonaws.com/pre-scan-builder/production/24.6.1/linux_amd64/psb
 RUN curl $PSB_URL --create-dirs -o /psb/bin/psb && chmod 0775 -R /psb
 ENV PATH=$PATH:/psb/bin/
 
 # Download the SAST CLI and set it in $PATH, can be replaced by:
 #--build-arg SASTCLI=URL
-RUN echo "Downloading SAST CLI version 23.11.2.2"
-ARG SASTCLI=https://downloads-sast.whitesourcesoftware.com/sast-cli/linux/wscli
-RUN curl $SASTCLI --create-dirs -o /sast/bin/wscli && chmod 0775 /sast/bin/wscli
+RUN echo "Downloading Mend Unified CLI wrapper"
+ARG SASTCLI=https://downloads.mend.io/cli/linux_amd64/mend
+RUN curl $SASTCLI --create-dirs -o /sast/bin/mend && chmod 0775 /sast/bin/mend
 ENV PATH=$PATH:/sast/bin
 
 
