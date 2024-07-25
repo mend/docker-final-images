@@ -1,5 +1,13 @@
 FROM mend/base-repo-controller:24.6.1
 
+ARG USER_NAME=user
+ARG USER_ID=1542
+ARG APP_ROOT=/usr/src/app
+
+# Set env and shell
+ENV BASH_ENV=/usr/local/etc/env
+SHELL ["/bin/bash" , "-c"]
+
 # copy folder
 COPY docker-image/ /
 

@@ -1,5 +1,14 @@
 FROM mend/base-repo-remediate:24.6.1
 
+# The containerbase supports custom user but Renovate requires ubuntu
+ARG USER_NAME=ubuntu
+ARG USER_ID=1000
+ARG APP_ROOT=/usr/src/app
+
+# Set env and shell
+ENV BASH_ENV=/usr/local/etc/env
+SHELL ["/bin/bash" , "-c"]
+
 WORKDIR ${APP_ROOT}
 
 COPY package.json yarn.lock ./
