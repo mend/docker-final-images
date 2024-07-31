@@ -33,6 +33,6 @@ EXPOSE 8080
 # Override home for openshift and add user bin to path
 ENV HOME=/home/$USER_NAME PATH=/home/$USER_NAME/bin:$PATH
 
-ENV RENOVATE_BINARY_SOURCE=install
+ENV RENOVATE_BINARY_SOURCE=global
 
 USER $USER_ID
