@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:24.6.1
+FROM mend/base-repo-scanner:24.9.1
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -17,8 +17,8 @@ SHELL ["/bin/bash", "-c"]
 
 # Download the pre-scan builder and set it in $PATH, can be replaced by:
 #--build-arg $PSB_URL=URL
-RUN echo "Downloading PSB version 24.6.2"
-ARG PSB_URL=https://wss-public.s3.amazonaws.com/pre-scan-builder/production/24.6.2/linux_amd64/psb
+RUN echo "Downloading PSB version 24.8.1"
+ARG PSB_URL=https://wss-public.s3.amazonaws.com/pre-scan-builder/production/24.8.1/linux_amd64/psb
 RUN curl $PSB_URL --create-dirs -o /psb/bin/psb && chmod 0775 -R /psb
 ENV PATH=$PATH:/psb/bin/
 
