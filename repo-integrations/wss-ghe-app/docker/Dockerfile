@@ -1,4 +1,4 @@
-FROM mend/base-repo-controller:24.6.1
+FROM mend/base-repo-controller:24.10.1
 
 ARG USER_NAME=user
 ARG USER_ID=1542

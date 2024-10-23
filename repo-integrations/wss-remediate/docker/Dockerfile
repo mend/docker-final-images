@@ -1,4 +1,4 @@
-FROM mend/base-repo-remediate:24.6.1
+FROM mend/base-repo-remediate:24.10.1
 
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
@@ -23,10 +23,12 @@ ARG WS_PLATFORM=enterprise
 ENV WS_PLATFORM=${WS_PLATFORM}
 ENV RENOVATE_X_MATCH_PACKAGE_NAMES_MORE=true
 ENV RENOVATE_X_DOCKER_HUB_TAGS=true
+ENV RENOVATE_X_EXEC_GPID_HANDLE=true
 
 # This entry point ensures that dumb-init is run
 ENTRYPOINT [ "docker-entrypoint.sh" ]
-CMD [ "node", "src/server.js" ]
+RUN node_default -v
+CMD [ "node_default", "src/server.js" ]
 
 EXPOSE 8080
 
