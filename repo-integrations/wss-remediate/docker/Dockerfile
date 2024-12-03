@@ -1,4 +1,4 @@
-FROM mend/base-repo-remediate:24.10.1
+FROM mend/base-repo-remediate:24.11.1
 
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
@@ -11,8 +11,8 @@ SHELL ["/bin/bash" , "-c"]
 
 WORKDIR ${APP_ROOT}
 
-COPY package.json yarn.lock ./
-RUN yarn install --production --frozen-lockfile && yarn cache clean
+COPY package.json package-lock.json ./
+RUN npm install --only=production && npm cache clean --force
 
 ARG SERVER_SRC=src/server.js
 ARG SERVER_DST=src/server.js
@@ -37,4 +37,6 @@ ENV HOME=/home/$USER_NAME PATH=/home/$USER_NAME/bin:$PATH
 
 ENV RENOVATE_BINARY_SOURCE=global
 
-USER $USER_ID
+ENV MEND_REMEDIATE_WORKER_CLEANUP_DIRS="/opt/containerbase, /tmp/renovate/cache, /tmp/renovate/repos, /home/ubuntu, /go"
+
+USER $USER_IDs
