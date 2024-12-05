@@ -39,4 +39,4 @@ ENV RENOVATE_BINARY_SOURCE=global
 
 ENV MEND_REMEDIATE_WORKER_CLEANUP_DIRS="/opt/containerbase, /tmp/renovate/cache, /tmp/renovate/repos, /home/ubuntu, /go"
 
-USER $USER_IDs
+USER $USER_ID
