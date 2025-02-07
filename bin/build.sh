@@ -50,4 +50,8 @@ zip -r agent-4-github-enterprise-$RELEASE-with-prebuilt.zip agent-4-github-enter
 # sanity check unzip to a new folder
 unzip -o agent-4-github-enterprise-$RELEASE-with-prebuilt.zip -d agent-4-github-enterprise-$RELEASE-with-prebuilt
 
+# Change to new folder and build images
+cd agent-4-github-enterprise-$RELEASE-with-prebuilt
+./build.sh
+
 exit 0
