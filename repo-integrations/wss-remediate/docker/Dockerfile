@@ -9,6 +9,8 @@ ARG APP_ROOT=/usr/src/app
 ENV BASH_ENV=/usr/local/etc/env
 SHELL ["/bin/bash" , "-c"]
 
+# START OF FINAL IMAGE
+
 WORKDIR ${APP_ROOT}
 
 COPY package.json package-lock.json ./

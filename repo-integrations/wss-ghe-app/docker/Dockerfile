@@ -8,6 +8,8 @@ ARG APP_ROOT=/usr/src/app
 ENV BASH_ENV=/usr/local/etc/env
 SHELL ["/bin/bash" , "-c"]
 
+# START OF FINAL IMAGE
+
 # copy folder
 COPY docker-image/ /
 

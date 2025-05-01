@@ -8,6 +8,8 @@ ARG APT_HTTP_PROXY
 ENV BASH_ENV=/usr/local/etc/env
 SHELL ["/bin/bash", "-c"]
 
+# START OF FINAL IMAGE
+
 ## Uncomment the below to enable Dynamic package manager install for selected package managers
 ##
 # COPY --from=containerbase/runinstall:20240327 /home/ubuntu/bin/runinstall ${USER_HOME}/.local/bin/runinstall
