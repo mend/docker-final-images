@@ -1,4 +1,4 @@
-FROM mend/base-repo-remediate:25.4.1.2
+FROM mend/base-repo-remediate:25.4.1.9
 
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
@@ -8,6 +8,8 @@ ARG APP_ROOT=/usr/src/app
 # Set env and shell
 ENV BASH_ENV=/usr/local/etc/env
 SHELL ["/bin/bash" , "-c"]
+
+# START OF FINAL IMAGE
 
 WORKDIR ${APP_ROOT}
 

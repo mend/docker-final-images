@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:25.4.1.2
+FROM mend/base-repo-scanner:25.4.1.9
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -7,6 +7,8 @@ ARG APT_HTTP_PROXY
 
 ENV BASH_ENV=/usr/local/etc/env
 SHELL ["/bin/bash", "-c"]
+
+# START OF FINAL IMAGE
 
 ## Uncomment the below to enable Dynamic package manager install for selected package managers
 ##
@@ -17,8 +19,8 @@ SHELL ["/bin/bash", "-c"]
 
 # Download the pre-scan builder and set it in $PATH, can be replaced by:
 #--build-arg $PSB_URL=URL
-RUN echo "Downloading PSB version 25.3.1"
-ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.3.1/linux_amd64/psb
+RUN echo "Downloading PSB version 25.4.1"
+ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.4.1/linux_amd64/psb
 RUN curl $PSB_URL --create-dirs -o /psb/bin/psb && chmod 0775 -R /psb
 ENV PATH=$PATH:/psb/bin/
 
@@ -30,7 +32,7 @@ RUN curl $SASTCLI --create-dirs -o /sast/bin/mend && chmod 0775 /sast/bin/mend
 ENV PATH=$PATH:/sast/bin
 
 ### copy folder
-COPY docker-image/ /
+COPY docker-image-scanner/ /
 
 RUN chmod 755 /start.sh
 RUN chgrp -R 0 ${USER_HOME} && chmod -R g=u ${USER_HOME}
