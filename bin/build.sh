@@ -1,9 +1,15 @@
 #!/bin/bash
+set -e
 
 if [ -z "$1" ]; then
   echo "Error: No release argument provided."
   exit 1
 fi
+
+if [ "$1" = "1.1.1" ]; then
+  echo "Error: Default version tag provided. Please provide the correct tag"
+  exit 1
+fi 
 
 RELEASE=$1
 
@@ -41,6 +47,21 @@ cp ../repo-integrations/wss-scanner/docker/Docker* ../tmp/agent-4-github-enterpr
 echo "Performing sanity test docker build"
 cd ../tmp/agent-4-github-enterprise-$RELEASE
 ./build.sh
+
+#Validate built images successfully created
+if [ -z "$(docker images -q wss-ghe-app:$RELEASE 2> /dev/null)" ]; then
+  echo "wss-ghe-app:$RELEASE was not built successfully"
+  exit 1
+fi
+if [ -z "$(docker images -q wss-scanner:$RELEASE 2> /dev/null)" ]; then
+  echo "wss-scanner:$RELEASE was not built successfully"
+  exit 1
+fi
+if [ -z "$(docker images -q wss-remediate:$RELEASE 2> /dev/null)" ]; then
+  echo "wss-remediate:$RELEASE was not built successfully"
+  exit 1
+fi
+
 
 echo "Building agent-4-github-enterprise-$RELEASE-with-prebuilt.zip"
 cd ..

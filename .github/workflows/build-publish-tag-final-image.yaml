@@ -1,0 +1,69 @@
+name: Build and Push Final Image Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      Tag:
+        description: "Base Image Tag to Deploy to docker hub"
+        default: "1.1.1"
+        type: string
+        
+      PreviousTag:
+        description: "Previously Deployed Base Image Tag"
+        default: "1.1.1"
+        type: string
+        
+permissions:
+  contents: write
+  
+jobs:
+  Build_And_Push_Base_Image:
+    runs-on: [ mend-self-hosted, profile=developer-platform-xlarge ]
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          ref: "main"
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: sudo apt install -y zip
+        
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "arn:aws:iam::054331651301:role/github-actions-repo-integration-docker-final-images-role"
+          aws-region: us-east-1
+
+      - name: Download Agent
+        run: |
+          ./bin/download.sh ${{ github.event.inputs.Tag }}
+          
+      - name: Update the Templates and Copy Template Into Agents
+        run: |
+          ./bin/copy.sh ${{ github.event.inputs.Tag }} ${{ github.event.inputs.PreviousTag }}
+      
+      - name: Build and zip the new Agents
+        run: |
+          ./bin/build.sh ${{ github.event.inputs.Tag }}
+
+      # Do the git tag/release stuff before s3 push since if there's a tag collision, we want to fail before pushing to s3
+      - name: Commit, Push and Tag Changes
+        run: |
+          # Note: using Github
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Saving new files for ${{ github.event.inputs.Tag }}"
+          git push
+          git tag -a ${{ github.event.inputs.Tag }} -m "Automated Tag for Release ${{ github.event.inputs.Tag }}"
+          git push origin --tags   
+          
+      - name: Push new zips to S3
+        run: |
+          aws s3 cp "agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
+          
+      
+          
+          
