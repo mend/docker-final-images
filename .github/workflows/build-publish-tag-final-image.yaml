@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       Tag:
-        description: "Base Image Tag to Deploy to docker hub"
+        description: "Final Image Tag to Deploy to docker hub"
         default: "1.1.1"
         type: string
         
       PreviousTag:
-        description: "Previously Deployed Base Image Tag"
+        description: "Previously Deployed Final Image Tag"
         default: "1.1.1"
         type: string
         
@@ -17,7 +17,7 @@ permissions:
   contents: write
   
 jobs:
-  Build_And_Push_Base_Image:
+  Build_And_Push_Final_Image:
     runs-on: [ mend-self-hosted, profile=developer-platform-xlarge ]
     
     steps:
