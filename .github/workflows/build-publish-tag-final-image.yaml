@@ -36,7 +36,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: "arn:aws:iam::054331651301:role/github-actions-repo-integration-docker-final-images-role"
+          role-to-assume: "arn:aws:iam::472613559203:role/github-actions-repo-integration-docker-final-images-role"
           aws-region: us-east-1
 
       - name: Download Agent
