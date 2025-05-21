@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install dependencies
-        run: sudo apt install -y zip
+        run: sudo apt-get -y install zip
         
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
