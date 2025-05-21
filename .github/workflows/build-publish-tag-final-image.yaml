@@ -47,22 +47,28 @@ jobs:
       - name: Build and zip the new Agents
         run: |
           ./bin/build.sh ${{ github.event.inputs.Tag }}
-
-      # Do the git tag/release stuff before s3 push since if there's a tag collision, we want to fail before pushing to s3
+          
+      - name: Push new zips to S3
+        run: |
+          aws s3 cp "agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
+          
       - name: Commit, Push and Tag Changes
         run: |
           # Note: using Github
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Saving new files for ${{ github.event.inputs.Tag }}"
-          git push
+          
+          if [[ `git status --porcelain` ]]; then
+            echo "OK: Changes detected, committing and pushing."
+            git add .
+            git commit -m "Saving new files for ${{ github.event.inputs.Tag }}"
+            git push
+          else
+            echo "WARNING: No changes were detected. This is fine though, skipping commit"
+          fi
+          
           git tag -a ${{ github.event.inputs.Tag }} -m "Automated Tag for Release ${{ github.event.inputs.Tag }}"
           git push origin --tags   
-          
-      - name: Push new zips to S3
-        run: |
-          aws s3 cp "agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
           
       
           
