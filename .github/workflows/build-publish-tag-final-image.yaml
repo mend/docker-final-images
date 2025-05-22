@@ -21,12 +21,6 @@ jobs:
   Build_And_Push_Final_Image:
     runs-on: [ mend-self-hosted, profile=developer-platform-xlarge ]
     
-    timeout-minutes: 60
-    
-    strategy:
-      fail-fast: false
-      matrix:
-    
     steps:
       - name: Check out code
         uses: actions/checkout@v3
