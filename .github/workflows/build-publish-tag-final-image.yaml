@@ -53,7 +53,7 @@ jobs:
 
       - name: Push new zips to S3
         run: |
-          aws s3 cp "agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
+          aws s3 cp "tmp/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
 
       - name: Commit, Push and Tag Changes
         run: |
