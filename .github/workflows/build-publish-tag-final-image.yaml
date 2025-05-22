@@ -21,6 +21,12 @@ jobs:
   Build_And_Push_Final_Image:
     runs-on: [ mend-self-hosted, profile=developer-platform-xlarge ]
     
+    timeout-minutes: 60
+    
+    strategy:
+      fail-fast: false
+      matrix:
+    
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -32,7 +38,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get -y install zip
-        
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -42,19 +48,19 @@ jobs:
       - name: Download Agent
         run: |
           ./bin/download.sh ${{ github.event.inputs.Tag }}
-          
+
       - name: Update the Templates and Copy Template Into Agents
         run: |
           ./bin/copy.sh ${{ github.event.inputs.Tag }} ${{ github.event.inputs.PreviousTag }}
-      
+
       - name: Build and zip the new Agents
         run: |
           ./bin/build.sh ${{ github.event.inputs.Tag }}
-          
+
       - name: Push new zips to S3
         run: |
           aws s3 cp "agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
-          
+
       - name: Commit, Push and Tag Changes
         run: |
           # Note: using Github
