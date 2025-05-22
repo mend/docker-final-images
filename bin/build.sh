@@ -48,20 +48,25 @@ echo "Performing sanity test docker build"
 cd ../tmp/agent-4-github-enterprise-$RELEASE
 ./build.sh
 
-#Validate built images successfully created
-if [ -z "$(docker images -q wss-ghe-app:$RELEASE 2> /dev/null)" ]; then
+#Validate built images successfully created 
+#We need to get the specifc build.sh version numbers because build.sh versions are weird
+wssGheAppVersion=$(grep -Eo -m 1 'wss-ghe-app:[1-9]+\d*(\.[1-9]+\d*)*' build.sh | head -1)
+if [ -z "$(docker images -q wssGheAppVersion 2> /dev/null)" ]; then
   echo "wss-ghe-app:$RELEASE was not built successfully"
   exit 1
 fi
-if [ -z "$(docker images -q wss-scanner:$RELEASE 2> /dev/null)" ]; then
+
+wssScannerVersion=$(grep -Eo -m 1 'wss-scanner:[1-9]+\d*(\.[1-9]+\d*)*' build.sh | head -1)
+if [ -z "$(docker images -q wssScannerVersion 2> /dev/null)" ]; then
   echo "wss-scanner:$RELEASE was not built successfully"
   exit 1
 fi
-if [ -z "$(docker images -q wss-remediate:$RELEASE 2> /dev/null)" ]; then
+
+wssRemediateVersion=$(grep -Eo -m 1 'wss-remediate:[1-9]+\d*(\.[1-9]+\d*)*' build.sh | head -1)
+if [ -z "$(docker images -q wssRemediateVersion 2> /dev/null)" ]; then
   echo "wss-remediate:$RELEASE was not built successfully"
   exit 1
 fi
-
 
 echo "Building agent-4-github-enterprise-$RELEASE-with-prebuilt.zip"
 cd ..
