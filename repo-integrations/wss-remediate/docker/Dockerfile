@@ -1,4 +1,4 @@
-FROM mend/base-repo-remediate:25.4.3.4
+FROM mend/base-repo-remediate:25.2.1.3
 
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
@@ -29,10 +29,8 @@ ENV RENOVATE_X_EXEC_GPID_HANDLE=true
 
 # This entry point ensures that dumb-init is run
 ENTRYPOINT [ "docker-entrypoint.sh" ]
-
 RUN node_default -v
-
-CMD [ "node_default", "/usr/src/mend/src/server.js" ]
+CMD [ "node_default", "src/server.js" ]
 
 EXPOSE 8080
 
@@ -41,7 +39,6 @@ ENV HOME=/home/$USER_NAME PATH=/home/$USER_NAME/bin:$PATH
 
 ENV RENOVATE_BINARY_SOURCE=global
 
-# Use the working dir Renovate cli expects
-WORKDIR /usr/src/app
+ENV MEND_REMEDIATE_WORKER_CLEANUP_DIRS="/opt/containerbase, /tmp/renovate/cache, /tmp/renovate/repos, /home/ubuntu, /go"
 
 USER $USER_ID
