@@ -12,6 +12,16 @@ on:
         description: "Previously Deployed Final Image Tag"
         default: "1.1.1"
         type: string
+
+      IsHotfix:
+        description: "IsHotfix: (default false) If True, release branch will not be merged back into main. Default is false."
+        default: false
+        type: boolean
+
+      SkipGit:
+        description: "SkipGit: (default false) If True, no changes will be made to repo. However, the new images will still be pushed to Docker Hub!"
+        default: false
+        type: boolean
         
 permissions:
   id-token: write
@@ -56,11 +66,24 @@ jobs:
           aws s3 cp "tmp/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip" "s3://wsd-integration/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-${{ github.event.inputs.Tag }}-with-prebuilt.zip"
 
       - name: Commit, Push and Tag Changes
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # If SkipGet is true, don't modify repo
+          if [ "${{ github.event.inputs.SkipGit }}" = true ]; then
+            echo "SkipGit is true, skipping git changes"
+            exit 0
+          fi
+
           # Note: using Github
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
+
+          # Create Release branch
+          git checkout -b release/${{ github.event.inputs.Tag }}
+          git push --set-upstream origin release/${{ github.event.inputs.Tag }}
+
+          # If files changed, add, commit and push
           if [[ `git status --porcelain` ]]; then
             echo "OK: Changes detected, committing and pushing."
             git add .
@@ -69,9 +92,25 @@ jobs:
           else
             echo "WARNING: No changes were detected. This is fine though, skipping commit"
           fi
-          
+
+          # Create tag
           git tag -a ${{ github.event.inputs.Tag }} -m "Automated Tag for Release ${{ github.event.inputs.Tag }}"
-          git push origin --tags   
+          git push origin --tags
+
+          # Create release
+          if [ "${{ github.event.inputs.IsHotfix }}" = true ]; then
+            gh release create "${{ github.event.inputs.Tag }}" --latest=false --generate-notes --target release/${{ github.event.inputs.Tag }} --title "${{ github.event.inputs.Tag }}"
+            echo "IsHotfix is true, not merging release branch back into main"
+            exit 0
+          else
+            gh release create "${{ github.event.inputs.Tag }}" --latest --generate-notes --target release/${{ github.event.inputs.Tag }} --title "${{ github.event.inputs.Tag }}"
+          fi
+
+          # Merge release branch back into main
+          git checkout main
+          git merge release/${{ github.event.inputs.Tag }} --commit --no-edit
+          git push
+        shell: bash 
           
       
           
