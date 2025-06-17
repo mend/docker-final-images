@@ -13,9 +13,9 @@ on:
         default: "1.1.1"
         type: string
 
-      IsHotfix:
-        description: "IsHotfix: (default false) If True, release branch will not be merged back into main. Default is false."
-        default: false
+      IsLatest:
+        description: "IsLatest: (default true) If True, release branch will be merged back into main and release will be set as latest."
+        default: true
         type: boolean
 
       SkipGit:
@@ -98,9 +98,9 @@ jobs:
           git push origin --tags
 
           # Create release
-          if [ "${{ github.event.inputs.IsHotfix }}" = true ]; then
+          if [ "${{ github.event.inputs.IsLatest }}" = false ]; then
             gh release create "${{ github.event.inputs.Tag }}" --latest=false --generate-notes --target release/${{ github.event.inputs.Tag }} --title "${{ github.event.inputs.Tag }}"
-            echo "IsHotfix is true, not merging release branch back into main"
+            echo "IsLatest is false, not merging release branch back into main"
             exit 0
           else
             gh release create "${{ github.event.inputs.Tag }}" --latest --generate-notes --target release/${{ github.event.inputs.Tag }} --title "${{ github.event.inputs.Tag }}"
