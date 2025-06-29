@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:25.2.1.3
+FROM mend/base-repo-scanner:25.6.1
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -19,10 +19,22 @@ SHELL ["/bin/bash", "-c"]
 
 # Download the pre-scan builder and set it in $PATH, can be replaced by:
 #--build-arg $PSB_URL=URL
-RUN echo "Downloading PSB version 25.1.2"
-ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.1.2/linux_amd64/psb
+RUN echo "Downloading PSB version 25.4.1"
+ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.4.1/linux_amd64/psb
 RUN curl $PSB_URL --create-dirs -o /psb/bin/psb && chmod 0775 -R /psb
 ENV PATH=$PATH:/psb/bin/
+
+# Download the mend sca tool
+#--build-arg $SCA_TOOL_URL=URL
+USER 0
+ARG SCA_TOOL_URL=https://downloads.mend.io/production/sca/sca-wrapper/25.4.3.3/linux_amd64/sca-wrapper
+RUN echo "Downloading Mend SCA tool [$SCA_TOOL_URL]"
+RUN curl $SCA_TOOL_URL --create-dirs -o /sca-wrapper/bin/sca-wrapper && chmod 0777 -R /sca-wrapper
+ENV MEND_SCA_BIN_DIR=/sca-wrapper/bin
+ENV PATH=$PATH:$MEND_SCA_BIN_DIR
+ENV MEND_SCA_SCAN_PRINT_ENGINE_LOGS=true
+RUN sca_tool_version="$(sca-wrapper version)" && echo "Mend-SCA-Tool Version:" $sca_tool_version
+RUN sca-wrapper init && chmod 0777 -R /sca-wrapper
 
 # Download the SAST CLI and set it in $PATH, can be replaced by:
 #--build-arg SASTCLI=URL
@@ -32,7 +44,7 @@ RUN curl $SASTCLI --create-dirs -o /sast/bin/mend && chmod 0775 /sast/bin/mend
 ENV PATH=$PATH:/sast/bin
 
 ### copy folder
-COPY docker-image/ /
+COPY docker-image-scanner/ /
 
 RUN chmod 755 /start.sh
 RUN chgrp -R 0 ${USER_HOME} && chmod -R g=u ${USER_HOME}
