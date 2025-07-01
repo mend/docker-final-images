@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:25.6.1-full
+FROM mend/base-repo-scanner:25.6.1.3-full
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
