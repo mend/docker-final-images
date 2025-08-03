@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   Build_And_Push_Final_Image:
-    runs-on: [mend-self-hosted, profile=developer-platform-xlarge]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out code
