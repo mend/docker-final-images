@@ -3,7 +3,7 @@ FROM mend/base-repo-remediate:25.7.1.1
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
 ARG USER_ID=1000
-ARG APP_ROOT=/usr/src/app
+ARG APP_ROOT=/usr/src/mend
 
 # Set env and shell
 ENV BASH_ENV=/usr/local/etc/env
