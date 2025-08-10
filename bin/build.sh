@@ -59,7 +59,7 @@ else
   echo "$wssGheAppVersion Built successfully!"
 fi
 
-wssScannerVersion=$(grep -Eo -m 1 'wss-scanner:[1-9]+\d*(\.[1-9]+\d*)*' build.sh | head -1)
+wssScannerVersion=$(grep -Eo -m 1 'wss-scanner:([1-9][0-9]*)(\.[1-9][0-9]*)*' build.sh | head -1)
 echo "Found version: $wssScannerVersion"
 if [ -z "$(docker images -q $wssScannerVersion 2> /dev/null)" ]; then
   echo "wss-scanner:$RELEASE was not built successfully"
