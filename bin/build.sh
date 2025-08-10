@@ -50,7 +50,7 @@ cd ../tmp/agent-4-github-enterprise-$RELEASE
 
 #Validate built images successfully created 
 #We need to get the specifc build.sh version numbers because build.sh versions are weird
-wssGheAppVersion=$(grep -Eo -m 1 'wss-ghe-app:[1-9]+\d*(\.[1-9]+\d*)*' build.sh | head -1)
+wssGheAppVersion=$(grep -Eo -m 1 'wss-ghe-app:([1-9][0-9]*)(\.[1-9][0-9]*)*' build.sh | head -1)
 echo "Found version: $wssGheAppVersion"
 if [ -z "$(docker images -q $wssGheAppVersion 2> /dev/null)" ]; then
   echo "wss-ghe-app:$RELEASE was not built successfully"
@@ -68,7 +68,7 @@ else
   echo "$wssScannerVersion Built successfully!"
 fi
 
-wssRemediateVersion=$(grep -Eo -m 1 'wss-remediate:[1-9]+\d*(\.[1-9]+\d*)*' build.sh | head -1)
+wssRemediateVersion=$(grep -Eo -m 1 'wss-remediate:([1-9][0-9]*)(\.[1-9][0-9]*)*' build.sh | head -1)
 echo "Found version: $wssRemediateVersion"
 if [ -z "$(docker images -q $wssRemediateVersion 2> /dev/null)" ]; then
   echo "wss-remediate:$RELEASE was not built successfully"
