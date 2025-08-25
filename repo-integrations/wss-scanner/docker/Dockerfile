@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:25.7.1.1
+FROM mend/base-repo-scanner:25.8.1.1
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -19,15 +19,15 @@ SHELL ["/bin/bash", "-c"]
 
 # Download the pre-scan builder and set it in $PATH, can be replaced by:
 #--build-arg $PSB_URL=URL
-RUN echo "Downloading PSB version 25.4.1"
-ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.4.1/linux_amd64/psb
+RUN echo "Downloading PSB version 8.1"
+ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.8.1/linux_amd64/psb
 RUN curl $PSB_URL --create-dirs -o /psb/bin/psb && chmod 0775 -R /psb
 ENV PATH=$PATH:/psb/bin/
 
 # Download the mend sca tool
 #--build-arg $SCA_TOOL_URL=URL
 USER 0
-ARG SCA_TOOL_URL=https://downloads.mend.io/production/sca/sca-wrapper/25.6.2.1/linux_amd64/sca-wrapper
+ARG SCA_TOOL_URL=https://downloads.mend.io/production/sca/sca-wrapper/25.7.2.1/linux_amd64/sca-wrapper
 RUN echo "Downloading Mend SCA tool [$SCA_TOOL_URL]"
 RUN curl $SCA_TOOL_URL --create-dirs -o /sca-wrapper/bin/sca-wrapper && chmod 0777 -R /sca-wrapper
 ENV MEND_SCA_BIN_DIR=/sca-wrapper/bin
@@ -45,6 +45,8 @@ ENV PATH=$PATH:/sast/bin
 
 ### copy folder
 COPY docker-image-scanner/ /
+
+# Temporarily copying the current Dockerfile to generate the installed-versions.json file.
 
 RUN chmod 755 /start.sh
 RUN chgrp -R 0 ${USER_HOME} && chmod -R g=u ${USER_HOME}
