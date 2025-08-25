@@ -81,8 +81,10 @@ fi
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $scaScannerDockerfileTemplate
 #Replace the previous release tag with the new tag
 sed -i "s/$PREVIOUS_RELEASE/$RELEASE/g" $scaScannerDockerfileTemplate
-#Now copy over everything after # END OF BASE IMAGE from the downloaded agent
-sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfile >> $scaScannerDockerfileTemplate
+#Now copy over everything after # END OF BASE IMAGE from the downloaded agent, excluding version scanner block
+sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfile | \
+sed '/^ARG THIS_DOCKERFILE_NAME=/,/&& rm \/tmp\/target-dockerfile && rm \/generate_versions_json\.sh$/d' >> $scaScannerDockerfileTemplate
+
 
 ### -------- Handle wss-scanner Dockerfilefull! ------------
 
@@ -99,8 +101,9 @@ fi
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $scaScannerDockerfilefullTemplate
 #Replace the previous release tag with the new tag
 sed -i "s/$PREVIOUS_RELEASE/$RELEASE/g" $scaScannerDockerfilefullTemplate
-#Now copy over everything after # END OF BASE IMAGE from the downloaded agent
-sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfile >> $scaScannerDockerfilefullTemplate
+#Now copy over everything after # END OF BASE IMAGE from the downloaded agent, excluding version scanner block
+sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfilefull | \
+sed '/^ARG THIS_DOCKERFILE_NAME=/,/&& rm \/tmp\/target-dockerfile && rm \/generate_versions_json\.sh$/d' >> $scaScannerDockerfilefullTemplate
 
 ### -------- Handle wss-remediate Dockerfile! ------------
 
