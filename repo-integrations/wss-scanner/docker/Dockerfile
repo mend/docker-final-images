@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:25.8.1.1
+FROM mend/base-repo-scanner:25.8.1.2
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -46,7 +46,6 @@ ENV PATH=$PATH:/sast/bin
 ### copy folder
 COPY docker-image-scanner/ /
 
-# Temporarily copying the current Dockerfile to generate the installed-versions.json file.
 
 RUN chmod 755 /start.sh
 RUN chgrp -R 0 ${USER_HOME} && chmod -R g=u ${USER_HOME}
