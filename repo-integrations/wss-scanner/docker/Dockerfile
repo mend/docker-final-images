@@ -1,4 +1,4 @@
-FROM mend/base-repo-scanner:25.10.1.2
+FROM mend/base-repo-scanner:25.9.1.8-cap
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -22,17 +22,12 @@ SHELL ["/bin/bash", "-c"]
 RUN echo "Downloading PSB version 8.1"
 ARG PSB_URL=https://downloads.mend.io/production/sca/pre-scan-builder/25.8.1/linux_amd64/psb
 RUN curl $PSB_URL --create-dirs -o /psb/bin/psb && chmod 0775 -R /psb
-# ┌────────────┬────────────┬────────────────────────────────────────────────────┐
-# │ Severity   │ Count      │ CVEs                                               │
-# ├────────────┼────────────┼────────────────────────────────────────────────────┤
-# │ High       │ 2          │ CVE-2025-47907, CVE-2024-34156                     │
-# └────────────┴────────────┴────────────────────────────────────────────────────┘
 ENV PATH=$PATH:/psb/bin/
 
 # Download the mend sca tool
 #--build-arg $SCA_TOOL_URL=URL
 USER 0
-ARG SCA_TOOL_URL=https://downloads.mend.io/production/sca/sca-wrapper/25.9.1.1/linux_amd64/sca-wrapper
+ARG SCA_TOOL_URL=https://downloads.mend.io/production/sca/sca-wrapper/25.8.2.3/linux_amd64/sca-wrapper
 RUN echo "Downloading Mend SCA tool [$SCA_TOOL_URL]"
 RUN curl $SCA_TOOL_URL --create-dirs -o /sca-wrapper/bin/sca-wrapper && chmod 0777 -R /sca-wrapper
 ENV MEND_SCA_BIN_DIR=/sca-wrapper/bin
@@ -41,22 +36,8 @@ ENV MEND_SCA_SCAN_PRINT_ENGINE_LOGS=true
 USER ${USER_ID}
 RUN sca_tool_version="$(sca-wrapper version)" && echo "Mend-SCA-Tool Version:" $sca_tool_version
 RUN sca-wrapper init
-# ┌────────────┬────────────┬────────────────────────────────────────────────────┐
-# │ Severity   │ Count      │ CVEs                                               │
-# ├────────────┼────────────┼────────────────────────────────────────────────────┤
-# │ Critical   │ 1          │ CVE-2023-42282                                     │
-# ├────────────┼────────────┼────────────────────────────────────────────────────┤
-# │ High       │ 3          │ CVE-2024-29415, CVE-2024-21538, CVE-2022-25883     │
-# └────────────┴────────────┴────────────────────────────────────────────────────┘
 USER 0
 RUN chmod 0777 -R /sca-wrapper
-# ┌────────────┬────────────┬───────────────────────────────────────────────────────────────────┐
-# │ Severity   │ Count      │ CVEs                                                              │
-# ├────────────┼────────────┼───────────────────────────────────────────────────────────────────┤
-# │ High       │ 12         │ CVE-2025-22869, CVE-2025-47907, CVE-2025-47907, CVE-2024-34156    │
-# │            │            │ CVE-2025-47907, CVE-2025-22874, CVE-2025-30204, CVE-2025-47907    │
-# │            │            │ CVE-2024-7254, CVE-2022-3510, CVE-2022-3509, CVE-2022-3171        │
-# └────────────┴────────────┴───────────────────────────────────────────────────────────────────┘
 
 # Download the SAST CLI and set it in $PATH, can be replaced by:
 #--build-arg SASTCLI=URL
@@ -67,12 +48,6 @@ ENV PATH=$PATH:/sast/bin
 
 ### copy folder
 COPY docker-image-scanner/ /
-# ┌────────────┬────────────┬─────────────────────────────────────────────────────────────────┐
-# │ Severity   │ Count      │ CVEs                                                            │
-# ├────────────┼────────────┼─────────────────────────────────────────────────────────────────┤
-# │ High       │ 7          │ CVE-2025-58056, CVE-2024-7254, CVE-2025-58057, CVE-2023-3894    │
-# │            │            │ CVE-2022-3510, CVE-2022-3509, CVE-2022-3171                     │
-# └────────────┴────────────┴─────────────────────────────────────────────────────────────────┘
 
 
 RUN chmod 755 /start.sh
