@@ -1,4 +1,4 @@
-FROM mend/base-repo-remediate:25.10.1.3-c
+FROM mend/base-repo-remediate:25.10.1.3-cs-beta
 
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
