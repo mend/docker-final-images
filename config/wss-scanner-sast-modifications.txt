@@ -1,0 +1,17 @@
+# Docker modification commands for wss-scanner-sast
+# Format: ACTION:PATTERN:REPLACEMENT
+#
+# Available actions:
+# REMOVE:pattern                    - Remove lines matching pattern
+# COMMENT:pattern                   - Comment out single lines matching pattern
+# COMMENT_BLOCK:pattern             - Comment out multi-line blocks (use with caution)
+# ADD_AFTER:pattern:new_line        - Add line after pattern
+# ADD_BEFORE:pattern:new_line       - Add line before pattern
+# REPLACE:pattern:new_line          - Replace line matching pattern
+
+# Comment out download CLI for mend resources
+COMMENT_BLOCK:# Download the SAST CLI
+
+# Add all SAST engine installation commands as a bulk after END OF BASE IMAGE
+ADD_AFTER:# END OF BASE IMAGE:COPY self-contained-sast-25.10.2.tar.gz .|COPY mend /sast/bin/mend|RUN chmod 0775 /sast/bin/mend|ENV PATH="/sast/bin:${PATH}"|RUN echo "Extracting Mend SAST artifacts"|RUN mkdir -p ${USER_HOME}/.mend \|    && tar -xzf self-contained-sast-25.10.2.tar.gz -C ${USER_HOME}/.mend \|    && chown -R wss-scanner:wss-scanner ${USER_HOME}/.mend \|    && rm self-contained-sast-25.10.2.tar.gz
+

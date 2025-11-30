@@ -1,0 +1,92 @@
+name: Build and Push Staging Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      ZipVersion:
+        description: "ZIP version to be released to be used as source"
+        default: "1.1.1"
+        type: string
+
+      PreviousTag:
+        description: "Previously Deployed Final Image Tag"
+        default: "1.1.1"
+        type: string
+
+      SastSelfContainedVersion:
+        description: "Version of the SAST self-contained engine (optional, defaults to ZipVersion)"
+        default: ""
+        type: string
+
+      IsLatest:
+        description: "Should we merge the changes to develop branch as well? (default false)"
+        default: false
+        type: boolean
+
+      SkipGit:
+        description: "Skip Git operations: (default false) If True, no changes will be made to repo"
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  Build_And_Push_Staging_Images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          ref: "develop"
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install zip
+
+      - name: Configure AWS credentials for Staging ECR
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "arn:aws:iam::472613559203:role/github-actions-repo-integration-docker-final-images-role"
+          aws-region: us-east-1
+
+      - name: Download GHE ZIP and SAST Self Contained and Mend Binary
+        run: |
+          ./bin/stg-download.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+
+      - name: Update Dockerfiles
+        run: |
+          ./bin/stg-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.PreviousTag }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+
+      - name: Build and test Docker images
+        run: |
+          ./bin/stg-build.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+
+      - name: Login to Amazon ECR (Staging)
+        id: login-ecr-staging
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry: 054331651301.dkr.ecr.us-east-1.amazonaws.com
+
+      - name: Publish images to Staging ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr-staging.outputs.registry }}
+        run: |
+          ./bin/stg-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${REGISTRY}" "${{ github.event.inputs.IsLatest }}"
+
+      - name: Upload ZIP to S3 staging bucket
+        run: |
+          ./bin/stg-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Git operations and release branch creation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ./bin/stg-git-operations.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ github.event.inputs.SkipGit }}"
+
+      - name: Send Slack notification
+        run: |
+          ./bin/stg-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ secrets.SLACK_WEBHOOK_URL_STAGING }}"
