@@ -60,6 +60,7 @@ echo "=== Step 2: Modifying Dockerfiles ==="
 if [ -z "$ECR_REGISTRY" ]; then
     echo "Error: ECR_REGISTRY environment variable must be set"
     echo "Example: export ECR_REGISTRY=054331651301.dkr.ecr.us-east-1.amazonaws.com"
+    echo "Or use: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 054331651301.dkr.ecr.us-east-1.amazonaws.com"
     exit 1
 fi
 ./bin/stg-copy.sh "$ZIP_VERSION" "$SAST_SELF_CONTAINED_VERSION" "$PREVIOUS_TAG"

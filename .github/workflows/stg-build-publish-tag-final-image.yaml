@@ -53,13 +53,20 @@ jobs:
           role-to-assume: "arn:aws:iam::472613559203:role/github-actions-repo-integration-docker-final-images-role"
           aws-region: us-east-1
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registries: "054331651301"
+          region: "us-east-1"
+
       - name: Download GHE ZIP and SAST Self Contained and Mend Binary
         run: |
           ./bin/stg-download.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
 
       - name: Update Dockerfiles
         env:
-          ECR_REGISTRY: 054331651301.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           ./bin/stg-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.PreviousTag }}"
 
@@ -67,15 +74,9 @@ jobs:
         run: |
           ./bin/stg-build.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
 
-      - name: Login to Amazon ECR (Staging)
-        id: login-ecr-staging
-        uses: aws-actions/amazon-ecr-login@v1
-        with:
-          registry: 054331651301.dkr.ecr.us-east-1.amazonaws.com
-
       - name: Publish images to Staging ECR
         env:
-          REGISTRY: ${{ steps.login-ecr-staging.outputs.registry }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           ./bin/stg-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${REGISTRY}" "${{ github.event.inputs.IsLatest }}"
 

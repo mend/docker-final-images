@@ -157,7 +157,9 @@ The following placeholders need to be updated with actual values:
 - `SAST_BINARY_BUCKET` - SAST binary S3 bucket URL (needs confirmation)
 
 ### ECR Registry
-- ✅ **Staging ECR**: `054331651301.dkr.ecr.us-east-1.amazonaws.com` (configured)
+- ✅ **Staging ECR**: Uses `aws-actions/amazon-ecr-login@v1` with `registries: "054331651301"` and `region: "us-east-1"`
+- ✅ **Dynamic Registry**: ECR registry URL is set via `${{ steps.login-ecr.outputs.registry }}`
+- ✅ **No Hard-coding**: Registry URL is generated automatically by the ECR login action
 
 ### S3 Bucket
 - `PLACEHOLDER_STAGING_S3_BUCKET` in `stg-upload-s3.sh`
