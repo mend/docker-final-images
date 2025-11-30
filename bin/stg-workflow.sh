@@ -72,7 +72,7 @@ echo "=== Step 6: Git operations ==="
 
 # Step 7: Send Slack notification
 echo "=== Step 7: Sending Slack notification ==="
-./bin/stg-send-notification.sh "$ZIP_VERSION" "$SAST_SELF_CONTAINED_VERSION" "$IS_LATEST" "PLACEHOLDER_SLACK_WEBHOOK_URL"
+./bin/stg-send-notification.sh "$ZIP_VERSION" "$SAST_SELF_CONTAINED_VERSION" "$IS_LATEST" "$STG_SLACK_WEBHOOK_URL"
 
 echo ""
 echo "=== Staging Workflow Completed Successfully ==="

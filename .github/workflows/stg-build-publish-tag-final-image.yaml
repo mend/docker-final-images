@@ -88,5 +88,7 @@ jobs:
           ./bin/stg-git-operations.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ github.event.inputs.SkipGit }}"
 
       - name: Send Slack notification
+        env:
+          STG_SLACK_WEBHOOK_URL: ${{ secrets.STG_SLACK_WEBHOOK_URL }}
         run: |
-          ./bin/stg-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ secrets.SLACK_WEBHOOK_URL_STAGING }}"
+          ./bin/stg-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}"

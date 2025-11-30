@@ -58,7 +58,7 @@ echo "   - GHE_BUCKET path in stg-download.sh"
 echo "   - SAST_BINARY_BUCKET path in stg-download.sh (confirm binary location)"
 echo "   ✅ Staging ECR registry: 054331651301.dkr.ecr.us-east-1.amazonaws.com (configured)"
 echo "   - Staging S3 bucket in stg-upload-s3.sh"
-echo "   - Slack webhook URL in stg-send-notification.sh"
+echo "   ✅ Slack webhook: STG_SLACK_WEBHOOK_URL secret (configured)"
 echo "   - AWS credentials for staging environment"
 echo ""
 

@@ -4,7 +4,6 @@ set -e
 ZIP_VERSION=$1
 SAST_SELF_CONTAINED_VERSION=$2
 IS_LATEST=$3
-SLACK_WEBHOOK_URL=$4
 
 if [ -z "$ZIP_VERSION" ]; then
   echo "Error: No ZIP version argument provided."
@@ -21,12 +20,14 @@ if [ -z "$IS_LATEST" ]; then
   exit 1
 fi
 
-if [ -z "$SLACK_WEBHOOK_URL" ]; then
-  echo "Error: No Slack webhook URL provided."
+# Get webhook URL from environment variable instead of parameter
+if [ -z "$STG_SLACK_WEBHOOK_URL" ]; then
+  echo "Error: STG_SLACK_WEBHOOK_URL environment variable not provided."
   exit 1
 fi
 
-
+# Mask the webhook URL in GitHub Actions logs
+echo "::add-mask::$STG_SLACK_WEBHOOK_URL"
 
 RELEASE_BRANCH="release/$ZIP_VERSION"
 
@@ -68,7 +69,7 @@ echo "Sending notification to Slack..."
 # Send to Slack
 RESPONSE=$(curl -s -X POST -H 'Content-type: application/json' \
     --data "$JSON_PAYLOAD" \
-    "$SLACK_WEBHOOK_URL")
+    "$STG_SLACK_WEBHOOK_URL")
 
 if [ "$RESPONSE" = "ok" ]; then
     echo "Slack notification sent successfully"

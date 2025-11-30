@@ -137,8 +137,7 @@ The following placeholders need to be updated with actual values:
 - Update workflow S3 upload command
 
 ### Slack Integration
-- `PLACEHOLDER_SLACK_WEBHOOK_URL` in `stg-send-notification.sh`
-- `PLACEHOLDER_STAGING_CHANNEL` in `stg-send-notification.sh`
+- ✅ **Webhook Secret**: `STG_SLACK_WEBHOOK_URL` (configured in repository secrets)
 - Add `SLACK_WEBHOOK_URL_STAGING` secret to repository
 
 ## Branch Strategy
