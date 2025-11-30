@@ -32,13 +32,18 @@ The staging workflow is designed to:
 ### Manual Execution
 
 ```bash
+# Set required environment variable
+export ECR_REGISTRY=054331651301.dkr.ecr.us-east-1.amazonaws.com
+
 # Run the complete staging workflow
-./bin/stg-workflow.sh <ZIP_VERSION> <SAST_SELF_CONTAINED_VERSION> <IS_LATEST> <SKIP_GIT> <PREVIOUS_RELEASE>
+./bin/stg-workflow.sh <ZIP_VERSION> <SAST_SELF_CONTAINED_VERSION> <IS_LATEST> <SKIP_GIT> [PREVIOUS_TAG]
 
 # Examples:
-./bin/stg-workflow.sh 1.2.3 2.1.0 true false 1.2.2   # Merge to develop
-./bin/stg-workflow.sh 1.2.3 "" false false 1.2.2     # Use ZIP_VERSION for SAST, release branch only  
-./bin/stg-workflow.sh 1.2.3 2.1.0 true true 1.2.2    # Skip git operations
+export ECR_REGISTRY=054331651301.dkr.ecr.us-east-1.amazonaws.com
+./bin/stg-workflow.sh 1.2.3 2.1.0 true false          # Basic usage
+./bin/stg-workflow.sh 1.2.3 "" false false           # Use ZIP_VERSION for SAST, release branch only  
+./bin/stg-workflow.sh 1.2.3 2.1.0 true false 1.2.2   # With optional previous tag for future use
+./bin/stg-workflow.sh 1.2.3 2.1.0 true true          # Skip git operations
 ```
 
 ### GitHub Actions
@@ -47,8 +52,8 @@ Use the workflow: `.github/workflows/new-stg-build-publish-tag-final-image.yaml`
 
 **Parameters:**
 - **ZipVersion**: ZIP version to be released (e.g., `1.2.3`)
-- **PreviousTag**: Previously deployed final image tag (e.g., `1.2.2`)
 - **SastSelfContainedVersion**: SAST self-contained engine version (optional, defaults to ZipVersion)
+- **PreviousTag**: Previously deployed final image tag (optional, for future use)
 - **IsLatest**: Whether to merge changes to develop branch (`true`/`false`)
 - **SkipGit**: Skip git operations (`true`/`false`)
 
@@ -61,7 +66,12 @@ Use the workflow: `.github/workflows/new-stg-build-publish-tag-final-image.yaml`
      - `mend` binary file
 
 2. **Modify Dockerfiles**
-   - Update base image versions in Dockerfiles
+   - Update base image sources for staging (uses ECR instead of Mend Hub):
+     - Controller: `FROM mend/base-repo-controller:*` → `FROM 054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-controller:$ZIP_VERSION`
+     - Scanner: `FROM mend/base-repo-scanner:*` → `FROM 054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-scanner:$ZIP_VERSION`
+     - Scanner Full: `FROM mend/base-repo-scanner:*-full` → `FROM 054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-scanner:$ZIP_VERSION-full`
+     - Scanner SAST: `FROM mend/base-repo-scanner-sast:*` → `FROM 054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-scanner-sast:$ZIP_VERSION`
+     - Remediate: `FROM mend/base-repo-remediate:*` → `FROM 054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-remediate:$ZIP_VERSION`
    - Copy changes from downloaded agent
    - Apply custom modifications from config files (optional)
 
@@ -83,6 +93,22 @@ Use the workflow: `.github/workflows/new-stg-build-publish-tag-final-image.yaml`
 6. **Notify**
    - Send Slack notification to staging channel
 
+## Image Source Strategy
+
+The staging workflow uses different base image sources depending on the environment:
+
+### **Staging/Development Environment**
+- **Base Images**: ECR registry (`054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-*`)
+- **Branches**: `develop`, `release/*` branches
+- **Reason**: Uses ECR-hosted base images for staging consistency and testing
+
+### **Production Environment**
+- **Base Images**: Mend Hub (`mend/base-repo-*`)
+- **Branch**: `main` branch only
+- **Reason**: Uses official Mend Hub images for production releases
+
+This ensures staging environments test with ECR images while production maintains official Mend Hub image sources.
+
 ## Dockerfile Modifications
 
 The workflow supports additional Dockerfile modifications through configuration files. After the standard Dockerfile processing, custom modifications can be applied.
@@ -93,8 +119,9 @@ Create modification files in the `config/` directory:
 - `config/wss-ghe-app-modifications.txt`
 - `config/wss-scanner-modifications.txt`
 - `config/wss-scanner-full-modifications.txt`
-- `config/wss-scanner-sast-modifications.txt`
 - `config/wss-remediate-modifications.txt`
+
+**Note**: SAST modifications for `wss-scanner-sast` are handled directly in the script with dynamic version numbers, so no separate configuration file is needed.
 
 ### Modification Commands
 

@@ -8,13 +8,13 @@ on:
         default: "1.1.1"
         type: string
 
-      PreviousTag:
-        description: "Previously Deployed Final Image Tag"
-        default: "1.1.1"
-        type: string
-
       SastSelfContainedVersion:
         description: "Version of the SAST self-contained engine (optional, defaults to ZipVersion)"
+        default: ""
+        type: string
+
+      PreviousTag:
+        description: "Previously Deployed Final Image Tag (optional, for future use)"
         default: ""
         type: string
 
@@ -58,8 +58,10 @@ jobs:
           ./bin/stg-download.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
 
       - name: Update Dockerfiles
+        env:
+          ECR_REGISTRY: 054331651301.dkr.ecr.us-east-1.amazonaws.com
         run: |
-          ./bin/stg-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.PreviousTag }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+          ./bin/stg-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.PreviousTag }}"
 
       - name: Build and test Docker images
         run: |

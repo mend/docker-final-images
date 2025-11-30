@@ -3,25 +3,26 @@ set -e
 
 # Function to print usage
 usage() {
-    echo "Usage: $0 <ZIP_VERSION> <SAST_SELF_CONTAINED_VERSION> <IS_LATEST> <SKIP_GIT> <PREVIOUS_RELEASE>"
+    echo "Usage: $0 <ZIP_VERSION> <SAST_SELF_CONTAINED_VERSION> <IS_LATEST> <SKIP_GIT> [PREVIOUS_TAG]"
     echo "  ZIP_VERSION: The ZIP version to be released"
     echo "  SAST_SELF_CONTAINED_VERSION: The version of the SAST self-contained engine (optional, defaults to ZIP_VERSION)"
     echo "  IS_LATEST: 'true' to merge to develop branch, 'false' to create release branch only"
     echo "  SKIP_GIT: 'true' to skip git operations, 'false' for normal operation"
-    echo "  PREVIOUS_RELEASE: Previously deployed final image tag"
+    echo "  PREVIOUS_TAG: Previously deployed final image tag (optional, for future use)"
     echo ""
-    echo "Example: $0 1.2.3 2.1.0 true false 1.2.2"
-    echo "Example: $0 1.2.3 '' false true 1.2.2   # Uses ZIP_VERSION for SAST"
+    echo "Example: $0 1.2.3 2.1.0 true false"
+    echo "Example: $0 1.2.3 '' false true   # Uses ZIP_VERSION for SAST"
+    echo "Example: $0 1.2.3 2.1.0 true false 1.2.2   # With previous tag"
     exit 1
 }
 
 # Check arguments
-if [ -z "$1" ] || [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ]; then
+if [ -z "$1" ] || [ -z "$3" ] || [ -z "$4" ]; then
     echo "Error: Missing required arguments."
     usage
 fi
 
-if [ "$1" = "1.1.1" ] || [ "$5" = "1.1.1" ]; then
+if [ "$1" = "1.1.1" ]; then
     echo "Error: Default version tags provided. Please provide correct versions."
     exit 1
 fi
@@ -30,7 +31,7 @@ ZIP_VERSION=$1
 SAST_SELF_CONTAINED_VERSION=$2
 IS_LATEST=$3
 SKIP_GIT=$4
-PREVIOUS_RELEASE=$5
+PREVIOUS_TAG=${5:-""}
 
 RELEASE_BRANCH="release/$ZIP_VERSION"
 
@@ -42,7 +43,11 @@ echo "ZIP Version: $ZIP_VERSION"
 echo "SAST Self-Contained Version: $SAST_SELF_CONTAINED_VERSION"
 echo "Is Latest: $IS_LATEST"
 echo "Skip Git: $SKIP_GIT"
-echo "Previous Release: $PREVIOUS_RELEASE"
+if [ -n "$PREVIOUS_TAG" ]; then
+    echo "Previous Tag: $PREVIOUS_TAG"
+else
+    echo "Previous Tag: Not provided (using pattern-based replacement)"
+fi
 echo "Release Branch: $RELEASE_BRANCH"
 echo ""
 
@@ -52,7 +57,12 @@ echo "=== Step 1: Downloading files ==="
 
 # Step 2: Modify Dockerfiles
 echo "=== Step 2: Modifying Dockerfiles ==="
-./bin/stg-copy.sh "$ZIP_VERSION" "$PREVIOUS_RELEASE"
+if [ -z "$ECR_REGISTRY" ]; then
+    echo "Error: ECR_REGISTRY environment variable must be set"
+    echo "Example: export ECR_REGISTRY=054331651301.dkr.ecr.us-east-1.amazonaws.com"
+    exit 1
+fi
+./bin/stg-copy.sh "$ZIP_VERSION" "$SAST_SELF_CONTAINED_VERSION" "$PREVIOUS_TAG"
 
 # Step 3: Build and test images
 echo "=== Step 3: Building and testing Docker images ==="
