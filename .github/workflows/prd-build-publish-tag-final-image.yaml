@@ -1,0 +1,150 @@
+name: Build and Push Production Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      ZipVersion:
+        description: "ZIP version to be released (from staging)"
+        default: "1.1.1"
+        type: string
+
+      IsLatest:
+        description: "Should we merge the changes to main branch as well? (default true)"
+        default: true
+        type: boolean
+
+      SkipGit:
+        description: "Skip Git operations: (default false) If True, no changes will be made to repo"
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  Build_And_Push_Production_Images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          ref: "main"
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install zip
+
+      - name: Configure AWS credentials for Staging ECR (for prod images)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: "arn:aws:iam::472613559203:role/github-actions-repo-integration-docker-final-images-role"
+          aws-region: us-east-1
+
+      - name: Login to Staging ECR (for prod images)
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: "054331651301"
+          mask-password: true
+
+      - name: Download pre-built ZIP from staging bucket
+        run: |
+          ./bin/prd-download.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Update Dockerfiles for production (mend/ prefix)
+        run: |
+          ./bin/prd-copy.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Git operations and production branch creation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # If SkipGit is true, don't modify repo
+          if [ "${{ github.event.inputs.SkipGit }}" = "true" ]; then
+            echo "SkipGit is true, skipping git operations"
+            exit 0
+          fi
+
+          # Set git config
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Checkout existing staging release branch (created by staging pipeline)
+          git checkout release/${{ github.event.inputs.ZipVersion }}
+
+          # Create production branch from staging release
+          git checkout -b production/${{ github.event.inputs.ZipVersion }}
+          git push origin production/${{ github.event.inputs.ZipVersion }}
+
+      - name: Download production SAST files and replace staging versions
+        run: |
+          ./bin/prd-download-prod-files.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Build and test Docker images
+        run: |
+          ./bin/prd-build.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Publish images to Staging ECR with prod prefix (for validation)
+        env:
+          STAGING_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          ./bin/prd-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${STAGING_ECR_REGISTRY}"
+
+      - name: Upload ZIP to S3 production bucket
+        run: |
+          ./bin/prd-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Finalize git operations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # If SkipGit is true, don't modify repo
+          if [ "${{ github.event.inputs.SkipGit }}" = "true" ]; then
+            echo "SkipGit is true, skipping git finalization"
+            exit 0
+          fi
+
+          # Set git config
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Switch to production branch (should already be there)
+          git checkout production/${{ github.event.inputs.ZipVersion }}
+
+          # If files changed, add, commit and push
+          if [[ `git status --porcelain` ]]; then
+            echo "Changes detected, committing and pushing production changes."
+            git add .
+            git commit -m "Production version with mend/ prefix for ${{ github.event.inputs.ZipVersion }}"
+            git push
+          else
+            echo "No changes detected, skipping commit"
+          fi
+
+          # Create production tag
+          git tag -a ${{ github.event.inputs.ZipVersion }}-prod -m "Production Release ${{ github.event.inputs.ZipVersion }}"
+          git push origin --tags
+
+          # Create release from production branch
+          if [ "${{ github.event.inputs.IsLatest }}" = "false" ]; then
+            gh release create "${{ github.event.inputs.ZipVersion }}-prod" --latest=false --generate-notes --target production/${{ github.event.inputs.ZipVersion }} --title "Production Release ${{ github.event.inputs.ZipVersion }}"
+            echo "IsLatest is false, not merging production branch to main"
+            exit 0
+          else
+            gh release create "${{ github.event.inputs.ZipVersion }}-prod" --latest --generate-notes --target production/${{ github.event.inputs.ZipVersion }} --title "Production Release ${{ github.event.inputs.ZipVersion }}"
+          fi
+
+          # Merge PRODUCTION branch to main if IsLatest is true (customers get production version)
+          echo "IsLatest is true, merging production branch to main"
+          git checkout main
+          git merge production/${{ github.event.inputs.ZipVersion }} --commit --no-edit
+          git push
+
+      - name: Send Slack notification
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.PRD_SLACK_WEBHOOK_URL }}
+        run: |
+          ./bin/prd-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.IsLatest }}"

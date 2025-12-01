@@ -21,13 +21,13 @@ if [ -z "$IS_LATEST" ]; then
 fi
 
 # Get webhook URL from environment variable instead of parameter
-if [ -z "$STG_SLACK_WEBHOOK_URL" ]; then
-  echo "Error: STG_SLACK_WEBHOOK_URL environment variable not provided."
+if [ -z "$SLACK_WEBHOOK_URL" ]; then
+  echo "Error: SLACK_WEBHOOK_URL environment variable not provided."
   exit 1
 fi
 
 # Mask the webhook URL in GitHub Actions logs
-echo "::add-mask::$STG_SLACK_WEBHOOK_URL"
+echo "::add-mask::$SLACK_WEBHOOK_URL"
 
 RELEASE_BRANCH="release/$ZIP_VERSION"
 
@@ -47,10 +47,11 @@ MESSAGE="🚀 *New Staging Images Published!*
 • Merged to develop: \`$IS_LATEST\`
 
 *Images Published:*
-• \`wss-ghe-app:prebuilt-$ZIP_VERSION\`
-• \`wss-scanner:prebuilt-$ZIP_VERSION\`
-• \`wss-scanner-sast:prebuilt-$ZIP_VERSION\`
-• \`wss-remediate:prebuilt-$ZIP_VERSION\`
+• \`$ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION\`
+• \`$ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION\`
+• \`$ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION-full\`
+• \`$ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION\`
+• \`$ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION\`
 
 *Staging Environment Ready for Testing* ✅"
 
@@ -69,7 +70,7 @@ echo "Sending notification to Slack..."
 # Send to Slack
 RESPONSE=$(curl -s -X POST -H 'Content-type: application/json' \
     --data "$JSON_PAYLOAD" \
-    "$STG_SLACK_WEBHOOK_URL")
+    "$SLACK_WEBHOOK_URL")
 
 if [ "$RESPONSE" = "ok" ]; then
     echo "Slack notification sent successfully"
