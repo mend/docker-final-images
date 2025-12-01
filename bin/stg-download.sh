@@ -5,7 +5,7 @@ ZIP_VERSION=$1
 SAST_SELF_CONTAINED_VERSION=$2
 
 # Download configuration
-GHE_ZIP_PATH="https://integrations.mend.io/release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-$ZIP_VERSION.zip"
+GHE_ZIP_PATH="s3://wsd-integration/pre-release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-$ZIP_VERSION.zip"
 SAST_SELF_CONTAINED_PATH="https://mend-unified-cli.s3.amazonaws.com/staging/sast/self-contained/linux_amd64/5139c224-38[…]a8d6f6285/$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
 SAST_BINARY_PATH="TODO_CONFIRM_BINARY_PATH/mend" # TODO: Confirm if same as self-contained bucket or different path
 
@@ -44,9 +44,9 @@ cd "$parent_path"
 
 # Check if ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip exists
 if [ ! -f ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip ]; then
-  echo "Downloading agent-4-github-enterprise-$ZIP_VERSION.zip"
+  echo "Downloading agent-4-github-enterprise-$ZIP_VERSION.zip from S3"
   mkdir -p ../tmp
-  curl -o ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip $GHE_ZIP_PATH
+  aws s3 cp $GHE_ZIP_PATH ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip
 fi
 
 if [ ! -f ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip ]; then
