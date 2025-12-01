@@ -55,10 +55,10 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           registries: "054331651301"
-          region: "us-east-1"
+          mask-password: true
 
       - name: Download GHE ZIP and SAST Self Contained and Mend Binary
         run: |
