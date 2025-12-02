@@ -93,7 +93,7 @@ if [ -z "$(docker images -q $wssScannerSastVersion 2> /dev/null)" ]; then
   echo "wss-scanner-sast:$wssScannerSastVersion was not built successfully"
   exit 1
 else
-  echo "wssScannerSastVersion Built successfully!"
+  echo "$wssScannerSastVersion Built successfully!"
 fi
 
 wssRemediateVersion=$(grep -Eo -m 1 'wss-remediate:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)

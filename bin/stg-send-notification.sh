@@ -45,18 +45,18 @@ echo "SAST Self-Contained Version: $SAST_SELF_CONTAINED_VERSION"
 echo "Is Latest: $IS_LATEST"
 echo "Release Branch: $RELEASE_BRANCH"
 
-# Create JSON payload with proper escaping
-JSON_PAYLOAD=$(cat << 'EOF'
-{
-  "text": "🚀 *New Staging Images Published!*\n\n*Version Details:*\n• ZIP Version: `$ZIP_VERSION`\n• SAST Self-Contained Version: `$SAST_SELF_CONTAINED_VERSION`\n• Release Branch: `$RELEASE_BRANCH`\n• Merged to develop: `$IS_LATEST`\n\n*Images Published:*\n• `$ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION`\n• `$ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION`\n• `$ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION-full`\n• `$ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION`\n• `$ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION`\n\n*Staging Environment Ready for Testing* ✅",
-  "username": "GitHub Actions - Staging",
-  "icon_emoji": ":rocket:"
-}
-EOF
-)
-
-# Substitute variables in the JSON payload
-JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | sed "s/\$ZIP_VERSION/$ZIP_VERSION/g" | sed "s/\$SAST_SELF_CONTAINED_VERSION/$SAST_SELF_CONTAINED_VERSION/g" | sed "s/\$RELEASE_BRANCH/$RELEASE_BRANCH/g" | sed "s/\$IS_LATEST/$IS_LATEST/g" | sed "s/\$ECR_REGISTRY/$ECR_REGISTRY/g")
+# Create JSON payload using jq for safe variable substitution
+JSON_PAYLOAD=$(jq -n \
+  --arg zip_version "$ZIP_VERSION" \
+  --arg sast_version "$SAST_SELF_CONTAINED_VERSION" \
+  --arg release_branch "$RELEASE_BRANCH" \
+  --arg is_latest "$IS_LATEST" \
+  --arg ecr_registry "$ECR_REGISTRY" \
+  '{
+    "text": ("🚀 *New Staging Images Published!*\n\n*Version Details:*\n• ZIP Version: `" + $zip_version + "`\n• SAST Self-Contained Version: `" + $sast_version + "`\n• Release Branch: `" + $release_branch + "`\n• Merged to develop: `" + $is_latest + "`\n\n*Images Published:*\n• `" + $ecr_registry + "/wss-ghe-app:prebuilt-" + $zip_version + "`\n• `" + $ecr_registry + "/wss-scanner:prebuilt-" + $zip_version + "`\n• `" + $ecr_registry + "/wss-scanner:prebuilt-" + $zip_version + "-full`\n• `" + $ecr_registry + "/wss-scanner-sast:prebuilt-" + $zip_version + "`\n• `" + $ecr_registry + "/wss-remediate:prebuilt-" + $zip_version + "`\n\n*Staging Environment Ready for Testing* ✅"),
+    "username": "GitHub Actions - Staging",
+    "icon_emoji": ":rocket:"
+  }')
 
 echo "Sending notification to Slack..."
 
