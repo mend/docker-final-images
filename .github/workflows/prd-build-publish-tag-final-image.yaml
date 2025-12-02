@@ -8,6 +8,11 @@ on:
         default: "1.1.1"
         type: string
 
+      SastSelfContainedVersion:
+        description: "Version of the SAST self-contained engine (optional, defaults to ZipVersion)"
+        default: ""
+        type: string
+
       IsLatest:
         description: "Should we merge the changes to main branch as well? (default true)"
         default: true
@@ -54,9 +59,27 @@ jobs:
         run: |
           ./bin/prd-download.sh "${{ github.event.inputs.ZipVersion }}"
 
+      - name: Download production SAST files and replace staging versions
+        run: |
+          ./bin/prd-download-prod-files.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+
       - name: Update Dockerfiles for production (mend/ prefix)
         run: |
-          ./bin/prd-copy.sh "${{ github.event.inputs.ZipVersion }}"
+          ./bin/prd-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+
+      - name: Build and test Docker images
+        run: |
+          ./bin/prd-build.sh "${{ github.event.inputs.ZipVersion }}"
+
+      - name: Publish images to Staging ECR with prod prefix (for validation)
+        env:
+          STAGING_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          ./bin/prd-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${STAGING_ECR_REGISTRY}"
+
+      - name: Upload ZIP to S3 production bucket
+        run: |
+          ./bin/prd-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
 
       - name: Git operations and production branch creation
         env:
@@ -79,23 +102,6 @@ jobs:
           git checkout -b production/${{ github.event.inputs.ZipVersion }}
           git push origin production/${{ github.event.inputs.ZipVersion }}
 
-      - name: Download production SAST files and replace staging versions
-        run: |
-          ./bin/prd-download-prod-files.sh "${{ github.event.inputs.ZipVersion }}"
-
-      - name: Build and test Docker images
-        run: |
-          ./bin/prd-build.sh "${{ github.event.inputs.ZipVersion }}"
-
-      - name: Publish images to Staging ECR with prod prefix (for validation)
-        env:
-          STAGING_ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          ./bin/prd-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${STAGING_ECR_REGISTRY}"
-
-      - name: Upload ZIP to S3 production bucket
-        run: |
-          ./bin/prd-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
 
       - name: Finalize git operations
         env:

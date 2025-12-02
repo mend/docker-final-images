@@ -34,6 +34,7 @@ The staging workflow is designed to:
 ```bash
 # Set required environment variable
 export ECR_REGISTRY=054331651301.dkr.ecr.us-east-1.amazonaws.com
+export SLACK_WEBHOOK_URL=<your-staging-slack-webhook>
 
 # Run the complete staging workflow
 ./bin/stg-workflow.sh <ZIP_VERSION> <SAST_SELF_CONTAINED_VERSION> <IS_LATEST> <SKIP_GIT> [PREVIOUS_TAG]

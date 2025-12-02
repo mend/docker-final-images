@@ -7,7 +7,7 @@ SAST_SELF_CONTAINED_VERSION=$2
 # Download configuration
 GHE_ZIP_PATH="s3://wsd-integration/pre-release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-$ZIP_VERSION.zip"
 SAST_SELF_CONTAINED_PATH="https://mend-unified-cli.s3.amazonaws.com/staging/sast/self-contained/linux_amd64/5139c224-38[…]a8d6f6285/$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
-SAST_BINARY_PATH="TODO_CONFIRM_BINARY_PATH/mend" # TODO: Confirm if same as self-contained bucket or different path
+SAST_BINARY_PATH="https://mend-unified-cli.s3.amazonaws.com/staging/wrapper/latest/linux_amd64/mend"
 
 echo "Downloading GHE ZIP and SAST self-contained tar.gz"
 
@@ -42,23 +42,19 @@ fi
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
-# Check if ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip exists
-if [ ! -f ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip ]; then
-  echo "Downloading agent-4-github-enterprise-$ZIP_VERSION.zip from S3"
-  mkdir -p ../tmp
-  aws s3 cp $GHE_ZIP_PATH ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip
-fi
+# Always download agent-4-github-enterprise-$ZIP_VERSION.zip
+echo "Downloading agent-4-github-enterprise-$ZIP_VERSION.zip from S3"
+mkdir -p ../tmp
+aws s3 cp $GHE_ZIP_PATH ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip
 
 if [ ! -f ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip ]; then
     echo "Error: agent-4-github-enterprise-$ZIP_VERSION.zip not found."
     exit 1
 fi
 
-# Unzip agent-4-github-enterprise-$ZIP_VERSION.zip if the folder doesn't exist
-if [ ! -d ../tmp/agent-4-github-enterprise-$ZIP_VERSION ]; then
-  echo "Unzipping agent-4-github-enterprise-$ZIP_VERSION.zip"
-  unzip -o ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip -d ../tmp
-fi
+# Always unzip agent-4-github-enterprise-$ZIP_VERSION.zip
+echo "Unzipping agent-4-github-enterprise-$ZIP_VERSION.zip"
+unzip -o ../tmp/agent-4-github-enterprise-$ZIP_VERSION.zip -d ../tmp
 
 # Check if ../tmp/agent-4-github-enterprise-$ZIP_VERSION exists
 if [ ! -d ../tmp/agent-4-github-enterprise-$ZIP_VERSION ]; then
@@ -70,22 +66,18 @@ fi
 echo "Downloading SAST engine files for version: $SAST_SELF_CONTAINED_VERSION"
 mkdir -p ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION
 
-# Download self-contained-sast-<version>.tar.gz
-if [ ! -f ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz ]; then
-  echo "Downloading self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
-  curl -o ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz $SAST_SELF_CONTAINED_PATH
-fi
+# Always download self-contained-sast-<version>.tar.gz
+echo "Downloading self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
+curl -o ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz $SAST_SELF_CONTAINED_PATH
 
 if [ ! -f ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz ]; then
     echo "Error: self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz not found."
     exit 1
 fi
 
-# Download mend binary file
-if [ ! -f ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/mend ]; then
-  echo "Downloading mend binary file"
-  curl -o ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/mend $SAST_BINARY_PATH
-fi
+# Always download mend binary file
+echo "Downloading mend binary file"
+curl -o ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/mend $SAST_BINARY_PATH
 
 if [ ! -f ../tmp/sast-engine-$SAST_SELF_CONTAINED_VERSION/mend ]; then
     echo "Error: mend binary file not found."

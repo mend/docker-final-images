@@ -105,13 +105,13 @@ else
   echo "$wssRemediateVersion Built successfully!"
 fi
 
-echo "Building agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt-staging.zip"
+echo "Building agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip"
 cd ..
 # zip up the agent-4-github-enterprise-$ZIP_VERSION folder with SAST files included
-zip -r agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt-staging.zip agent-4-github-enterprise-$ZIP_VERSION
+zip -r agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip agent-4-github-enterprise-$ZIP_VERSION
 
 # sanity check unzip to a new folder
-unzip -o agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt-staging.zip -d agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt-staging
+unzip -o agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip -d agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt
 
 echo "Staging build completed successfully!"
 exit 0
