@@ -90,7 +90,7 @@ fi
 wssScannerSastVersion=$(grep -Eo -m 1 'wss-scanner-sast:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
 echo "Found version: wssScannerSastVersion"
 if [ -z "$(docker images -q wssScannerSastVersion 2> /dev/null)" ]; then
-  echo "wss-scanner:$ZIP_VERSION was not built successfully"
+  echo "wss-scanner-sast:$ZIP_VERSION was not built successfully"
   exit 1
 else
   echo "wssScannerSastVersion Built successfully!"

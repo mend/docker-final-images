@@ -12,7 +12,7 @@ if [ -z "$ZIP_VERSION" ]; then
   exit 1
 fi
 
-if [ -z "$SAST_SELF_CONTAINED_VERSION2" ]; then
+if [ -z "$SAST_SELF_CONTAINED_VERSION" ]; then
   echo "Error: No SAST self-contained version argument provided."
   exit 1
 fi
