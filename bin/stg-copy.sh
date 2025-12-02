@@ -46,7 +46,7 @@ fi
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $appDockerfileTemplate
 #Replace the base image to use ECR instead of mend/ for staging
-sed -i "s|FROM $ECR_REGISTRY/base-repo-controller:.*|FROM $ECR_REGISTRY/base-repo-controller:$ZIP_VERSION|g" $appDockerfileTemplate
+sed -i "s|FROM  $ECR_REGISTRY/base-repo-controller:.*|FROM  $ECR_REGISTRY/base-repo-controller:$ZIP_VERSION|g" $appDockerfileTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent
 sed '1,/# END OF BASE IMAGE/ d' $appdockerfile >> $appDockerfileTemplate
 
@@ -68,7 +68,7 @@ fi
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $scaScannerDockerfileTemplate
 #Replace the base image to use ECR instead of mend/ for staging
-sed -i "s|FROM $ECR_REGISTRY/base-repo-scanner:.*|FROM $ECR_REGISTRY/base-repo-scanner:$ZIP_VERSION|g" $scaScannerDockerfileTemplate
+sed -i "s|FROM  $ECR_REGISTRY/base-repo-scanner:.*|FROM  $ECR_REGISTRY/base-repo-scanner:$ZIP_VERSION|g" $scaScannerDockerfileTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent, excluding version scanner block
 sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfile | \
 sed '/^# Temporarily copying.*Dockerfile.*installed-versions/,/&& rm \/tmp\/target-dockerfile && rm \/generate_versions_json\.sh$/d' >> $scaScannerDockerfileTemplate
@@ -92,7 +92,7 @@ fi
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $scaScannerDockerfilefullTemplate
 #Replace the base image to use ECR instead of mend/ for staging with -full suffix
-sed -i "s|FROM $ECR_REGISTRY/base-repo-scanner:.*-full|FROM $ECR_REGISTRY/base-repo-scanner:$ZIP_VERSION-full|g" $scaScannerDockerfilefullTemplate
+sed -i "s|FROM  $ECR_REGISTRY/base-repo-scanner:.*-full|FROM  $ECR_REGISTRY/base-repo-scanner:$ZIP_VERSION-full|g" $scaScannerDockerfilefullTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent, excluding version scanner block
 sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfilefull | \
 sed '/^# Temporarily copying.*Dockerfile.*installed-versions/,/&& rm \/tmp\/target-dockerfile && rm \/generate_versions_json\.sh$/d' >> $scaScannerDockerfilefullTemplate
@@ -115,7 +115,7 @@ fi
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $sastScannerDockerfileTemplate
 #Replace the base image version using pattern matching for SAST scanner
-sed -i "s|FROM $ECR_REGISTRY/base-repo-scanner-sast:.*|FROM $ECR_REGISTRY/base-repo-scanner-sast:$ZIP_VERSION|g" $sastScannerDockerfileTemplate
+sed -i "s|FROM  $ECR_REGISTRY/base-repo-scanner-sast:.*|FROM  $ECR_REGISTRY/base-repo-scanner-sast:$ZIP_VERSION|g" $sastScannerDockerfileTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent
 sed '1,/# END OF BASE IMAGE/ d' $sastScannerDockerfile >> $sastScannerDockerfileTemplate
 
@@ -157,7 +157,7 @@ fi
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $remediateDockerfileTemplate
 #Replace the base image version using pattern matching
-sed -i "s|FROM $ECR_REGISTRY/base-repo-remediate:.*|FROM $ECR_REGISTRY/base-repo-remediate:$ZIP_VERSION|g" $remediateDockerfileTemplate
+sed -i "s|FROM  $ECR_REGISTRY/base-repo-remediate:.*|FROM  $ECR_REGISTRY/base-repo-remediate:$ZIP_VERSION|g" $remediateDockerfileTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent
 sed '1,/# END OF BASE IMAGE/ d' $remediateDockerfile >> $remediateDockerfileTemplate
 
