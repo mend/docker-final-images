@@ -42,6 +42,27 @@ cp ../repo-integrations/wss-ghe-app/docker/Dockerfile ../tmp/agent-4-github-ente
 cp ../repo-integrations/wss-remediate/docker/Dockerfile ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-remediate/docker/
 cp ../repo-integrations/wss-scanner/docker/Docker* ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/
 
+# Print updated Dockerfile contents for logging and triage
+echo "=== Updated wss-ghe-app Dockerfile Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-ghe-app/docker/Dockerfile
+echo "=== End of wss-ghe-app Dockerfile ==="
+
+echo "=== Updated wss-remediate Dockerfile Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-remediate/docker/Dockerfile
+echo "=== End of wss-remediate Dockerfile ==="
+
+echo "=== Updated wss-scanner Dockerfile Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/Dockerfile
+echo "=== End of wss-scanner Dockerfile ==="
+
+echo "=== Updated wss-scanner Dockerfilefull Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/Dockerfilefull
+echo "=== End of wss-scanner Dockerfilefull ==="
+
+echo "=== Updated wss-scanner DockerfileSast Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/DockerfileSast
+echo "=== End of wss-scanner DockerfileSast ==="
+
 
 # Copy SAST engine files to the package
 echo "Adding SAST engine files to the package"
@@ -64,7 +85,14 @@ else
 fi
 
 echo "Performing sanity test docker build"
+
 cd ../tmp/agent-4-github-enterprise-$ZIP_VERSION
+
+# Print buildwithsast.sh content for debugging and triage
+echo "=== buildwithsast.sh Content ==="
+cat buildwithsast.sh
+echo "=== End of buildwithsast.sh ==="
+
 ./buildwithsast.sh
 
 #Validate built images successfully created
