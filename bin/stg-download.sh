@@ -6,7 +6,7 @@ SAST_SELF_CONTAINED_VERSION=$2
 
 # Download configuration
 GHE_ZIP_PATH="s3://wsd-integration/pre-release/Agent-for-GitHub-Enterprise/agent-4-github-enterprise-$ZIP_VERSION.zip"
-SAST_SELF_CONTAINED_PATH="https://mend-unified-cli.s3.amazonaws.com/staging/sast/self-contained/linux_amd64/5139c224-38[…]a8d6f6285/$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
+SAST_SELF_CONTAINED_PATH="https://mend-unified-cli.s3.amazonaws.com/staging/sast/self-contained/linux_amd64/5139c224-38c2-427b-b080-a03a8d6f6285/$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
 SAST_BINARY_PATH="https://mend-unified-cli.s3.amazonaws.com/staging/wrapper/latest/linux_amd64/mend"
 
 echo "Downloading GHE ZIP and SAST self-contained tar.gz"
