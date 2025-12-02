@@ -41,13 +41,6 @@ echo "  - $wssScannerFullImage (for ECR publishing)"
 echo "  - $wssScannerSastImage"
 echo "  - $wssRemediateImage"
 
-# Verify required images exist (scanner full is required for ECR, regular scanner for validation)
-if [ -z "$wssGheAppImage" ] || [ -z "$wssScannerFullImage" ] || [ -z "$wssScannerSastImage" ] || [ -z "$wssRemediateImage" ]; then
-    echo "Error: Required Docker images not found locally (wss-ghe-app, wss-scanner full, wss-scanner-sast, wss-remediate)"
-    exit 1
-fi
-
-
 # Tag images for staging ECR (using prebuilt- as version prefix)
 echo "Tagging images for staging ECR..."
 docker tag $wssGheAppImage $ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION
@@ -55,37 +48,9 @@ docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION
 docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION
 docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION
 
-# Tag as latest if this is a latest release
-if [ "$IS_LATEST" = "true" ]; then
-    echo "Tagging as latest..."
-    docker tag $wssGheAppImage $ECR_REGISTRY/wss-ghe-app:prebuilt-latest
-    docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner:prebuilt-latest
-    docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast:prebuilt-latest
-    docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate:prebuilt-latest
-fi
-
 # Push images to staging ECR (using prebuilt- as version prefix)
 echo "Pushing images to staging ECR..."
 docker push $ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION
 docker push $ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION
 docker push $ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION
 docker push $ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION
-
-if [ "$IS_LATEST" = "true" ]; then
-    echo "Pushing latest tags..."
-    docker push $ECR_REGISTRY/wss-ghe-app:prebuilt-latest
-    docker push $ECR_REGISTRY/wss-scanner:prebuilt-latest
-    docker push $ECR_REGISTRY/wss-scanner-sast:prebuilt-latest
-    docker push $ECR_REGISTRY/wss-remediate:prebuilt-latest
-fi
-
-echo "Successfully published all images to staging ECR"
-echo "Published images:"
-echo "  - $ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION"
-echo "  - $ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION"
-echo "  - $ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION"
-echo "  - $ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION"
-
-if [ "$IS_LATEST" = "true" ]; then
-    echo "  - Latest tags also pushed"
-fi
