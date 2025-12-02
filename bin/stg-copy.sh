@@ -100,7 +100,7 @@ if [ ! -f $sastScannerDockerfile ]; then
 fi
 
 #First delete everything in repo file after # START OF FINAL IMAGE
-sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $sastScannerDockerfile
+sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $sastScannerDockerfileTemplate
 #Replace the base image version using pattern matching for SAST scanner
 sed -i "s|FROM $ECR_REGISTRY/base-repo-scanner-sast:.*|FROM $ECR_REGISTRY/base-repo-scanner-sast:$ZIP_VERSION|g" $sastScannerDockerfileTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent

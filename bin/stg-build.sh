@@ -72,7 +72,7 @@ cd ../tmp/agent-4-github-enterprise-$ZIP_VERSION
 wssGheAppVersion=$(grep -Eo -m 1 'wss-ghe-app:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
 echo "Found version: $wssGheAppVersion"
 if [ -z "$(docker images -q $wssGheAppVersion 2> /dev/null)" ]; then
-  echo "wss-ghe-app:$ZIP_VERSION was not built successfully"
+  echo "wss-ghe-app:$wssGheAppVersion was not built successfully"
   exit 1
 else
   echo "$wssGheAppVersion Built successfully!"
@@ -81,16 +81,16 @@ fi
 wssScannerVersion=$(grep -Eo -m 1 'wss-scanner:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
 echo "Found version: $wssScannerVersion"
 if [ -z "$(docker images -q $wssScannerVersion 2> /dev/null)" ]; then
-  echo "wss-scanner:$ZIP_VERSION was not built successfully"
+  echo "wss-scanner:$wssScannerVersion was not built successfully"
   exit 1
 else
   echo "$wssScannerVersion Built successfully!"
 fi
 
 wssScannerSastVersion=$(grep -Eo -m 1 'wss-scanner-sast:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
-echo "Found version: wssScannerSastVersion"
-if [ -z "$(docker images -q wssScannerSastVersion 2> /dev/null)" ]; then
-  echo "wss-scanner-sast:$ZIP_VERSION was not built successfully"
+echo "Found version: $wssScannerSastVersion"
+if [ -z "$(docker images -q $wssScannerSastVersion 2> /dev/null)" ]; then
+  echo "wss-scanner-sast:$wssScannerSastVersion was not built successfully"
   exit 1
 else
   echo "wssScannerSastVersion Built successfully!"
@@ -99,7 +99,7 @@ fi
 wssRemediateVersion=$(grep -Eo -m 1 'wss-remediate:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
 echo "Found version: $wssRemediateVersion"
 if [ -z "$(docker images -q $wssRemediateVersion 2> /dev/null)" ]; then
-  echo "wss-remediate:$ZIP_VERSION was not built successfully"
+  echo "wss-remediate:$wssRemediateVersion was not built successfully"
   exit 1
 else
   echo "$wssRemediateVersion Built successfully!"
