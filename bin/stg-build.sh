@@ -31,12 +31,6 @@ cd "$parent_path"
 
 echo "Building staging images for ZIP version: $ZIP_VERSION with SAST self-contained version: $SAST_SELF_CONTAINED_VERSION"
 
-# Check if the extracted folder exists
-if [ ! -d ../tmp/agent-4-github-enterprise-$ZIP_VERSION ]; then
-    echo "Error: agent-4-github-enterprise-$ZIP_VERSION folder not found."
-    exit 1
-fi
-
 # Copy updated Dockerfiles to the extracted folder
 cp ../repo-integrations/wss-ghe-app/docker/Dockerfile ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-ghe-app/docker/
 cp ../repo-integrations/wss-remediate/docker/Dockerfile ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-remediate/docker/
@@ -87,12 +81,6 @@ fi
 echo "Performing sanity test docker build"
 
 cd ../tmp/agent-4-github-enterprise-$ZIP_VERSION
-
-# Print buildwithsast.sh content for debugging and triage
-echo "=== buildwithsast.sh Content ==="
-cat buildwithsast.sh
-echo "=== End of buildwithsast.sh ==="
-
 ./buildwithsast.sh
 
 #Validate built images successfully created

@@ -50,6 +50,10 @@ sed -i "s|FROM $ECR_REGISTRY/base-repo-controller:.*|FROM $ECR_REGISTRY/base-rep
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent
 sed '1,/# END OF BASE IMAGE/ d' $appdockerfile >> $appDockerfileTemplate
 
+echo "=== Current wss-ghe-app Dockerfile Template Content ==="
+cat $appDockerfileTemplate
+echo "=== End of wss-ghe-app Dockerfile Template ==="
+
 ### -------- Handle wss-remediate Dockerfile! ------------
 
 echo "Processing wss-scanner Dockerfile"
@@ -68,6 +72,11 @@ sed -i "s|FROM $ECR_REGISTRY/base-repo-scanner:.*|FROM $ECR_REGISTRY/base-repo-s
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent, excluding version scanner block
 sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfile | \
 sed '/^# Temporarily copying.*Dockerfile.*installed-versions/,/&& rm \/tmp\/target-dockerfile && rm \/generate_versions_json\.sh$/d' >> $scaScannerDockerfileTemplate
+
+
+echo "=== Current wss-scanner Dockerfile Template Content ==="
+cat $scaScannerDockerfileTemplate
+echo "=== End of wss-scanner Dockerfile Template ==="
 
 ### -------- Handle wss-scanner Dockerfilefull! ------------
 
@@ -88,6 +97,9 @@ sed -i "s|FROM $ECR_REGISTRY/base-repo-scanner:.*-full|FROM $ECR_REGISTRY/base-r
 sed '1,/# END OF BASE IMAGE/ d' $scaScannerDockerfilefull | \
 sed '/^# Temporarily copying.*Dockerfile.*installed-versions/,/&& rm \/tmp\/target-dockerfile && rm \/generate_versions_json\.sh$/d' >> $scaScannerDockerfilefullTemplate
 
+echo "=== Current wss-scanner Dockerfilefull Template Content ==="
+cat $scaScannerDockerfilefullTemplate
+echo "=== End of wss-scanner Dockerfilefull Template ==="
 ### -------- Handle wss-scanner DockerfileSast! ------------
 
 echo "Processing wss-scanner DockerfileSast"
@@ -98,6 +110,7 @@ if [ ! -f $sastScannerDockerfile ]; then
   echo "Error: $sastScannerDockerfile not found."
   exit 1
 fi
+
 
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $sastScannerDockerfileTemplate
@@ -125,6 +138,10 @@ RUN mkdir -p ${USER_HOME}/.mend \\\
     && rm self-contained-sast-'$SAST_SELF_CONTAINED_VERSION'.tar.gz' $sastScannerDockerfileTemplate
 
 
+echo "=== Current wss-scanner DockerfileSast Template Content ==="
+cat $sastScannerDockerfileTemplate
+echo "=== End of wss-scanner DockerfileSast Template ==="
+
 ### -------- Handle wss-remediate Dockerfile! ------------
 
 echo "Processing wss-remediate Dockerfile"
@@ -136,12 +153,17 @@ if [ ! -f $remediateDockerfile ]; then
   exit 1
 fi
 
+
 #First delete everything in repo file after # START OF FINAL IMAGE
 sed -i '/# START OF FINAL IMAGE/{s/\(.*# START OF FINAL IMAGE\).*/\1/;q}' $remediateDockerfileTemplate
 #Replace the base image version using pattern matching
 sed -i "s|FROM $ECR_REGISTRY/base-repo-remediate:.*|FROM $ECR_REGISTRY/base-repo-remediate:$ZIP_VERSION|g" $remediateDockerfileTemplate
 #Now copy over everything after # END OF BASE IMAGE from the downloaded agent
 sed '1,/# END OF BASE IMAGE/ d' $remediateDockerfile >> $remediateDockerfileTemplate
+
+echo "=== Current wss-remediate Dockerfile Template Content ==="
+cat $remediateDockerfileTemplate
+echo "=== End of wss-remediate Dockerfile Template ==="
 
 echo "Completed processing all Dockerfiles"
 
