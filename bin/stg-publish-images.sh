@@ -30,7 +30,7 @@ echo "Is Latest: $IS_LATEST"
 # Get the actual built image tags from docker
 wssGheAppImage=$(docker images --filter "reference=wss-ghe-app:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
 wssScannerImage=$(docker images --filter "reference=wss-scanner:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
-wssScannerFullImage=$(docker images --filter "reference=wss-scanner:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | grep -E "(full|Full)" | head -1)
+wssScannerFullImage=$(docker images --filter "reference=wss-scanner-full:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
 wssScannerSastImage=$(docker images --filter "reference=wss-scanner-sast:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
 wssRemediateImage=$(docker images --filter "reference=wss-remediate:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
 
