@@ -82,7 +82,7 @@ echo "Performing sanity test docker build"
 
 cd ../tmp/agent-4-github-enterprise-$ZIP_VERSION
 ./buildwithsast.sh
-docker build -t wss-scanner-sast:$ZIP_VERSION -f wss-scanner/docker/DockerfileSast wss-scanner/docker
+docker build -t wss-scanner-full:$ZIP_VERSION -f wss-scanner/docker/Dockerfilefull wss-scanner/docker
 
 #Validate built images successfully created
 #We need to get the specific build.sh version numbers because build.sh versions are weird
