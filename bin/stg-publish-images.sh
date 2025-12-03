@@ -56,16 +56,6 @@ docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner-full-prebuilt:$ZIP_VER
 docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast-prebuilt:$ZIP_VERSION
 docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate-prebuilt:$ZIP_VERSION
 
-# Tag as latest if this is a latest release
-if [ "$IS_LATEST" = "true" ]; then
-    echo "Tagging as latest..."
-    docker tag $wssGheAppImage $ECR_REGISTRY/wss-ghe-app-prebuilt:latest
-    docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner-prebuilt:latest
-    docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner-full-prebuilt:latest
-    docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast-prebuilt:latest
-    docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate-prebuilt:latest
-fi
-
 # Push images to staging ECR (using prebuilt- as version prefix)
 echo "Pushing images to staging ECR..."
 docker push $ECR_REGISTRY/wss-ghe-app-prebuilt:$ZIP_VERSION
@@ -74,16 +64,6 @@ docker push $ECR_REGISTRY/wss-scanner-full-prebuilt:$ZIP_VERSION
 docker push $ECR_REGISTRY/wss-scanner-sast-prebuilt:$ZIP_VERSION
 docker push $ECR_REGISTRY/wss-remediate-prebuilt:$ZIP_VERSION
 
-
-if [ "$IS_LATEST" = "true" ]; then
-    echo "Pushing latest tags..."
-    docker push $ECR_REGISTRY/wss-ghe-app-prebuilt:latest
-    docker push $ECR_REGISTRY/wss-scanner-prebuilt:latest
-    docker push $ECR_REGISTRY/wss-scanner-full-prebuilt:latest
-    docker push $ECR_REGISTRY/wss-scanner-sast-prebuilt:latest
-    docker push $ECR_REGISTRY/wss-remediate-prebuilt:latest
-fi
-
 echo "Successfully published all images to staging ECR"
 echo "Published images:"
 echo "  - $ECR_REGISTRY/wss-ghe-app-prebuilt:$ZIP_VERSION"
@@ -91,7 +71,3 @@ echo "  - $ECR_REGISTRY/wss-scanner-prebuilt:$ZIP_VERSION"
 echo "  - $ECR_REGISTRY/wss-scanner-full-prebuilt:$ZIP_VERSION"
 echo "  - $ECR_REGISTRY/wss-scanner-sast-prebuilt:$ZIP_VERSION"
 echo "  - $ECR_REGISTRY/wss-remediate-prebuilt:$ZIP_VERSION"
-
-if [ "$IS_LATEST" = "true" ]; then
-    echo "  - Latest tags also pushed"
-fi
