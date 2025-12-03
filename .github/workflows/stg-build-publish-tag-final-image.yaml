@@ -88,7 +88,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          ./bin/stg-git-operations.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ github.event.inputs.SkipGit }}"
+          ./bin/stg-git-operations.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.IsLatest }}"
 
       - name: Send Slack notification
         env:
