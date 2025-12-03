@@ -70,19 +70,19 @@ jobs:
         run: |
           ./bin/stg-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.PreviousTag }}"
 
-#      - name: Build and test Docker images
-#        run: |
-#          ./bin/stg-build.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+      - name: Build and test Docker images
+        run: |
+          ./bin/stg-build.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
 
-#      - name: Publish images to Staging ECR
-#        env:
-#          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#        run: |
-#          ./bin/stg-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${REGISTRY}" "${{ github.event.inputs.IsLatest }}"
-#
-#      - name: Upload ZIP to S3 staging bucket
-#        run: |
-#          ./bin/stg-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
+      - name: Publish images to Staging ECR
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          ./bin/stg-publish-images.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${REGISTRY}" "${{ github.event.inputs.IsLatest }}"
+
+      - name: Upload ZIP to S3 staging bucket
+        run: |
+          ./bin/stg-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
 
       - name: Git operations and release branch creation
         env:
