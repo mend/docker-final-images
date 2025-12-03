@@ -44,11 +44,6 @@ fi
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-# Ensure we're on develop branch
-echo "Checking out develop branch..."
-git checkout develop
-git pull origin develop
-
 # Create Release branch
 RELEASE_BRANCH="release/$ZIP_VERSION"
 echo "Creating release branch: $RELEASE_BRANCH"
