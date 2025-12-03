@@ -3,10 +3,13 @@ set -e
 
 ZIP_VERSION=$1
 IS_LATEST=$2
+JOB_STATUS=$3
+GITHUB_ACTION_URL=$4
 
 echo "Sending Slack notification to production channel"
 echo "ZIP Version: $ZIP_VERSION"
 echo "Is Latest: $IS_LATEST"
+echo "Job Status: $JOB_STATUS"
 
 if [ -z "$ZIP_VERSION" ]; then
   echo "Error: No ZIP version argument provided."
@@ -15,6 +18,16 @@ fi
 
 if [ -z "$IS_LATEST" ]; then
   echo "Error: No IS_LATEST argument provided."
+  exit 1
+fi
+
+if [ -z "$JOB_STATUS" ]; then
+  echo "Error: No job status argument provided."
+  exit 1
+fi
+
+if [ -z "$GITHUB_ACTION_URL" ]; then
+  echo "Error: No GitHub Action URL argument provided."
   exit 1
 fi
 
@@ -51,6 +64,12 @@ else
     RELEASE_TYPE="Release"
 fi
 
+# S3 production zip information
+S3_PRODUCTION_ZIP_NAME="agent-4-github-enterprise-${ZIP_VERSION}-with-prebuilt.zip"
+
+echo "GitHub Action URL: $GITHUB_ACTION_URL"
+echo "S3 Production ZIP: $S3_PRODUCTION_ZIP_NAME"
+
 # Create Slack message
 SLACK_MESSAGE=$(cat <<EOF
 {
@@ -80,6 +99,10 @@ SLACK_MESSAGE=$(cat <<EOF
         },
         {
           "type": "mrkdwn",
+          "text": "*Job Status:*\n$JOB_STATUS"
+        },
+        {
+          "type": "mrkdwn",
           "text": "*Branch Status:*\n$BRANCH_INFO"
         }
       ]
@@ -97,7 +120,14 @@ SLACK_MESSAGE=$(cat <<EOF
         "type": "mrkdwn",
         "text": "*📦 Artifacts:*\n• ZIP: \`agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip\`\n• Staging ECR images with prod/ prefix for validation\n• S3 upload: production bucket"
       }
-    }
+    }$([ -n "$GITHUB_ACTION_URL" ] && echo ",
+    {
+      \"type\": \"section\",
+      \"text\": {
+        \"type\": \"mrkdwn\",
+        \"text\": \"*🔗 Build Details:*\n• <$GITHUB_ACTION_URL|View GitHub Action Run>\"
+      }
+    }")
   ]
 }
 EOF

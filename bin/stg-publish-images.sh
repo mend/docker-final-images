@@ -28,11 +28,11 @@ echo "ECR Registry: $ECR_REGISTRY"
 echo "Is Latest: $IS_LATEST"
 
 # Get the actual built image tags from docker
-wssGheAppImage=$(docker images --filter "reference=wss-ghe-app:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
-wssScannerImage=$(docker images --filter "reference=wss-scanner:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
-wssScannerFullImage=$(docker images --filter "reference=wss-scanner:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | grep -E "(full|Full)" | head -1)
-wssScannerSastImage=$(docker images --filter "reference=wss-scanner-sast:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
-wssRemediateImage=$(docker images --filter "reference=wss-remediate:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
+wssGheAppImage=$(docker images --filter "reference=wss-ghe-app-prebuilt:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
+wssScannerImage=$(docker images --filter "reference=wss-scanner-prebuilt:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
+wssScannerFullImage=$(docker images --filter "reference=wss-scanner-full-prebuilt:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
+wssScannerSastImage=$(docker images --filter "reference=wss-scanner-sast-prebuilt:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
+wssRemediateImage=$(docker images --filter "reference=wss-remediate-prebuilt:*" --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1)
 
 echo "Found local images:"
 echo "  - $wssGheAppImage"
@@ -50,42 +50,24 @@ fi
 
 # Tag images for staging ECR (using prebuilt- as version prefix)
 echo "Tagging images for staging ECR..."
-docker tag $wssGheAppImage $ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION
-docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION
-docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION
-docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION
-
-# Tag as latest if this is a latest release
-if [ "$IS_LATEST" = "true" ]; then
-    echo "Tagging as latest..."
-    docker tag $wssGheAppImage $ECR_REGISTRY/wss-ghe-app:prebuilt-latest
-    docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner:prebuilt-latest
-    docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast:prebuilt-latest
-    docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate:prebuilt-latest
-fi
+docker tag $wssGheAppImage $ECR_REGISTRY/wss-ghe-app-prebuilt:$ZIP_VERSION
+docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner-prebuilt:$ZIP_VERSION
+docker tag $wssScannerFullImage $ECR_REGISTRY/wss-scanner-full-prebuilt:$ZIP_VERSION
+docker tag $wssScannerSastImage $ECR_REGISTRY/wss-scanner-sast-prebuilt:$ZIP_VERSION
+docker tag $wssRemediateImage $ECR_REGISTRY/wss-remediate-prebuilt:$ZIP_VERSION
 
 # Push images to staging ECR (using prebuilt- as version prefix)
 echo "Pushing images to staging ECR..."
-docker push $ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION
-docker push $ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION
-docker push $ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION
-docker push $ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION
-
-if [ "$IS_LATEST" = "true" ]; then
-    echo "Pushing latest tags..."
-    docker push $ECR_REGISTRY/wss-ghe-app:prebuilt-latest
-    docker push $ECR_REGISTRY/wss-scanner:prebuilt-latest
-    docker push $ECR_REGISTRY/wss-scanner-sast:prebuilt-latest
-    docker push $ECR_REGISTRY/wss-remediate:prebuilt-latest
-fi
+docker push $ECR_REGISTRY/wss-ghe-app-prebuilt:$ZIP_VERSION
+docker push $ECR_REGISTRY/wss-scanner-prebuilt:$ZIP_VERSION
+docker push $ECR_REGISTRY/wss-scanner-full-prebuilt:$ZIP_VERSION
+docker push $ECR_REGISTRY/wss-scanner-sast-prebuilt:$ZIP_VERSION
+docker push $ECR_REGISTRY/wss-remediate-prebuilt:$ZIP_VERSION
 
 echo "Successfully published all images to staging ECR"
 echo "Published images:"
-echo "  - $ECR_REGISTRY/wss-ghe-app:prebuilt-$ZIP_VERSION"
-echo "  - $ECR_REGISTRY/wss-scanner:prebuilt-$ZIP_VERSION"
-echo "  - $ECR_REGISTRY/wss-scanner-sast:prebuilt-$ZIP_VERSION"
-echo "  - $ECR_REGISTRY/wss-remediate:prebuilt-$ZIP_VERSION"
-
-if [ "$IS_LATEST" = "true" ]; then
-    echo "  - Latest tags also pushed"
-fi
+echo "  - $ECR_REGISTRY/wss-ghe-app-prebuilt:$ZIP_VERSION"
+echo "  - $ECR_REGISTRY/wss-scanner-prebuilt:$ZIP_VERSION"
+echo "  - $ECR_REGISTRY/wss-scanner-full-prebuilt:$ZIP_VERSION"
+echo "  - $ECR_REGISTRY/wss-scanner-sast-prebuilt:$ZIP_VERSION"
+echo "  - $ECR_REGISTRY/wss-remediate-prebuilt:$ZIP_VERSION"

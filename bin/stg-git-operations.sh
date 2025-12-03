@@ -7,14 +7,15 @@ IS_LATEST=$3
 SKIP_GIT=$4
 
 
+
 if [ -z "$ZIP_VERSION" ]; then
   echo "Error: No ZIP version argument provided."
   exit 1
 fi
 
 if [ -z "$SAST_SELF_CONTAINED_VERSION" ]; then
-  echo "Error: No SAST self-contained version argument provided."
-  exit 1
+  echo "Error: No SAST self-contained version argument provided. Setting to $ZIP_VERSION."
+  SAST_SELF_CONTAINED_VERSION=$ZIP_VERSION
 fi
 
 if [ -z "$IS_LATEST" ]; then
@@ -43,11 +44,6 @@ fi
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-# Ensure we're on develop branch
-echo "Checking out develop branch..."
-git checkout develop
-git pull origin develop
-
 # Create Release branch
 RELEASE_BRANCH="release/$ZIP_VERSION"
 echo "Creating release branch: $RELEASE_BRANCH"
@@ -63,6 +59,11 @@ if [[ `git status --porcelain` ]]; then
 else
     echo "No changes were detected in Dockerfiles"
 fi
+
+ # Create tag
+git tag -a $$ZIP_VERSION -m "Automated Tag for Release $ZIP_VERSION"
+git push origin --tags
+
 
 # If IsLatest is true, merge to develop branch
 if [ "$IS_LATEST" = "true" ]; then

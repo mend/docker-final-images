@@ -31,16 +31,31 @@ cd "$parent_path"
 
 echo "Building staging images for ZIP version: $ZIP_VERSION with SAST self-contained version: $SAST_SELF_CONTAINED_VERSION"
 
-# Check if the extracted folder exists
-if [ ! -d ../tmp/agent-4-github-enterprise-$ZIP_VERSION ]; then
-    echo "Error: agent-4-github-enterprise-$ZIP_VERSION folder not found."
-    exit 1
-fi
-
 # Copy updated Dockerfiles to the extracted folder
 cp ../repo-integrations/wss-ghe-app/docker/Dockerfile ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-ghe-app/docker/
 cp ../repo-integrations/wss-remediate/docker/Dockerfile ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-remediate/docker/
 cp ../repo-integrations/wss-scanner/docker/Docker* ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/
+
+# Print updated Dockerfile contents for logging and triage
+echo "=== Updated wss-ghe-app Dockerfile Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-ghe-app/docker/Dockerfile
+echo "=== End of wss-ghe-app Dockerfile ==="
+
+echo "=== Updated wss-remediate Dockerfile Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-remediate/docker/Dockerfile
+echo "=== End of wss-remediate Dockerfile ==="
+
+echo "=== Updated wss-scanner Dockerfile Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/Dockerfile
+echo "=== End of wss-scanner Dockerfile ==="
+
+echo "=== Updated wss-scanner Dockerfilefull Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/Dockerfilefull
+echo "=== End of wss-scanner Dockerfilefull ==="
+
+echo "=== Updated wss-scanner DockerfileSast Content ==="
+cat ../tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker/DockerfileSast
+echo "=== End of wss-scanner DockerfileSast ==="
 
 
 # Copy SAST engine files to the package
@@ -64,45 +79,50 @@ else
 fi
 
 echo "Performing sanity test docker build"
+
 cd ../tmp/agent-4-github-enterprise-$ZIP_VERSION
-./buildwithsast.sh
+docker build -t wss-ghe-app-prebuilt:$ZIP_VERSION wss-ghe-app/docker
+docker build -t wss-scanner-prebuilt:$ZIP_VERSION wss-scanner/docker
+docker build -t wss-scanner-sast-prebuilt:$ZIP_VERSION -f wss-scanner/docker/DockerfileSast wss-scanner/docker
+docker build -t wss-scanner-full-prebuilt:$ZIP_VERSION -f wss-scanner/docker/Dockerfilefull wss-scanner/docker
+docker build -t wss-remediate-prebuilt:$ZIP_VERSION wss-remediate/docker
 
 #Validate built images successfully created
-#We need to get the specific build.sh version numbers because build.sh versions are weird
-wssGheAppVersion=$(grep -Eo -m 1 'wss-ghe-app:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
-echo "Found version: $wssGheAppVersion"
-if [ -z "$(docker images -q $wssGheAppVersion 2> /dev/null)" ]; then
-  echo "wss-ghe-app:$wssGheAppVersion was not built successfully"
+echo "Validating built images..."
+
+if [ -z "$(docker images -q wss-ghe-app-prebuilt:$ZIP_VERSION 2> /dev/null)" ]; then
+  echo "wss-ghe-app-prebuilt:$ZIP_VERSION was not built successfully"
   exit 1
 else
-  echo "$wssGheAppVersion Built successfully!"
+  echo "wss-ghe-app-prebuilt:$ZIP_VERSION built successfully!"
 fi
 
-wssScannerVersion=$(grep -Eo -m 1 'wss-scanner:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
-echo "Found version: $wssScannerVersion"
-if [ -z "$(docker images -q $wssScannerVersion 2> /dev/null)" ]; then
-  echo "wss-scanner:$wssScannerVersion was not built successfully"
+if [ -z "$(docker images -q wss-scanner-prebuilt:$ZIP_VERSION 2> /dev/null)" ]; then
+  echo "wss-scanner-prebuilt:$ZIP_VERSION was not built successfully"
   exit 1
 else
-  echo "$wssScannerVersion Built successfully!"
+  echo "wss-scanner-prebuilt:$ZIP_VERSION built successfully!"
 fi
 
-wssScannerSastVersion=$(grep -Eo -m 1 'wss-scanner-sast:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
-echo "Found version: $wssScannerSastVersion"
-if [ -z "$(docker images -q $wssScannerSastVersion 2> /dev/null)" ]; then
-  echo "wss-scanner-sast:$wssScannerSastVersion was not built successfully"
+if [ -z "$(docker images -q wss-scanner-sast-prebuilt:$ZIP_VERSION 2> /dev/null)" ]; then
+  echo "wss-scanner-sast-prebuilt:$ZIP_VERSION was not built successfully"
   exit 1
 else
-  echo "$wssScannerSastVersion Built successfully!"
+  echo "wss-scanner-sast-prebuilt:$ZIP_VERSION built successfully!"
 fi
 
-wssRemediateVersion=$(grep -Eo -m 1 'wss-remediate:([1-9][0-9]*)(\.[1-9][0-9]*)*(-[a-zA-Z0-9-]+)?' buildwithsast.sh | head -1)
-echo "Found version: $wssRemediateVersion"
-if [ -z "$(docker images -q $wssRemediateVersion 2> /dev/null)" ]; then
-  echo "wss-remediate:$wssRemediateVersion was not built successfully"
+if [ -z "$(docker images -q wss-scanner-full-prebuilt:$ZIP_VERSION 2> /dev/null)" ]; then
+  echo "wss-scanner-full-prebuilt:$ZIP_VERSION was not built successfully"
   exit 1
 else
-  echo "$wssRemediateVersion Built successfully!"
+  echo "wss-scanner-full-prebuilt:$ZIP_VERSION built successfully!"
+fi
+
+if [ -z "$(docker images -q wss-remediate-prebuilt:$ZIP_VERSION 2> /dev/null)" ]; then
+  echo "wss-remediate-prebuilt:$ZIP_VERSION was not built successfully"
+  exit 1
+else
+  echo "wss-remediate-prebuilt:$ZIP_VERSION built successfully!"
 fi
 
 echo "Building agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip"

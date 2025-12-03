@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   Build_And_Push_Production_Images:
-    runs-on: ubuntu-latest
+    runs-on: [ mend-self-hosted, profile=developer-platform-xlarge-od ]
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -153,4 +153,4 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.PRD_SLACK_WEBHOOK_URL }}
         run: |
-          ./bin/prd-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.IsLatest }}"
+          ./bin/prd-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ job.status }}" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
