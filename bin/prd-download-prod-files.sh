@@ -54,8 +54,9 @@ fi
 echo "Using SAST Self-Contained Version: $SAST_SELF_CONTAINED_VERSION"
 
 # Production download paths (update these with actual production paths)
-SAST_SELF_CONTAINED_PROD_PATH="https://mend-unified-cli.s3.amazonaws.com/production/sast/self-contained/linux_amd64/5139c224-38f2-4b2c-a9b7-34aa8d6f6285/$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
+SAST_SELF_CONTAINED_PROD_PATH="https://downloads.mend.io/production/sast/self-contained/linux_amd64/0455bde2-85ad-4a5e-9788-b51244f2d9ec/$SAST_SELF_CONTAINED_VERSION/self-contained-sast-$SAST_SELF_CONTAINED_VERSION.tar.gz"
 SAST_BINARY_PROD_PATH="https://downloads.mend.io/cli/linux_amd64/mend"
+
 
 # Download production SAST self-contained tar.gz
 echo "Downloading production SAST self-contained tar.gz"
