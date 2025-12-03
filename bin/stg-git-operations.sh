@@ -43,41 +43,40 @@ fi
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-# Create Release branch from current state (main with modifications)
+# Ensure we're on develop branch
+echo "Checking out develop branch..."
+git checkout develop
+git pull origin develop
+
+# Create Release branch
 RELEASE_BRANCH="release/$ZIP_VERSION"
-echo "Creating release branch: $RELEASE_BRANCH from current state..."
+echo "Creating release branch: $RELEASE_BRANCH"
 git checkout -b $RELEASE_BRANCH
 git push --set-upstream origin $RELEASE_BRANCH
 
 # If files changed, add, commit and push
 if [[ `git status --porcelain` ]]; then
-    echo "OK: Changes detected, committing and pushing..."
-    git add .
+    echo "Changes detected, committing and pushing..."
+    git add repo-integrations/
     git commit -m "feat: Update Dockerfiles for staging release $ZIP_VERSION with SAST self-contained $SAST_SELF_CONTAINED_VERSION"
     git push
 else
-    echo "WARNING: No changes were detected. This is fine though, skipping commit"
+    echo "No changes were detected in Dockerfiles"
 fi
 
-# Create tag
-git tag -a "$ZIP_VERSION" -m "Automated Staging Release $ZIP_VERSION with SAST $SAST_SELF_CONTAINED_VERSION"
-git push origin --tags
-
-# Create GitHub release
-if [ "$IS_LATEST" = "false" ]; then
-    gh release create "$ZIP_VERSION" --latest=false --generate-notes --target "$RELEASE_BRANCH" --title "Staging Release $ZIP_VERSION"
-    echo "IsLatest is false, not merging release branch back into develop"
-    exit 0
+# If IsLatest is true, merge to develop branch
+if [ "$IS_LATEST" = "true" ]; then
+    echo "IsLatest is true, merging changes to develop branch"
+    git checkout develop
+    git merge $RELEASE_BRANCH --no-ff -m "feat: Merge staging release $ZIP_VERSION"
+    git push origin develop
+    echo "Successfully merged release branch to develop"
 else
-    gh release create "$ZIP_VERSION" --latest --generate-notes --target "$RELEASE_BRANCH" --title "Staging Release $ZIP_VERSION"
+    echo "IsLatest is false, not merging to develop branch"
 fi
-
-# Merge release branch back into develop
-echo "IsLatest is true, merging release branch back into develop..."
-git checkout develop
-git merge "$RELEASE_BRANCH" --commit --no-edit
-git push
 
 echo "Git operations completed successfully"
 echo "Release branch created: $RELEASE_BRANCH"
-echo "Changes merged to develop branch"
+if [ "$IS_LATEST" = "true" ]; then
+    echo "Changes merged to develop branch"
+fi
