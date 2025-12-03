@@ -4,6 +4,8 @@ set -e
 ZIP_VERSION=$1
 SAST_SELF_CONTAINED_VERSION=$2
 IS_LATEST=$3
+SKIP_GIT=$4
+
 
 
 if [ -z "$ZIP_VERSION" ]; then
@@ -21,10 +23,22 @@ if [ -z "$IS_LATEST" ]; then
   exit 1
 fi
 
+if [ -z "$SKIP_GIT" ]; then
+  echo "Error: No SkipGit argument provided."
+  exit 1
+fi
+
 echo "Processing Git operations for staging release"
 echo "ZIP Version: $ZIP_VERSION"
 echo "SAST Self-Contained Version: $SAST_SELF_CONTAINED_VERSION"
 echo "Is Latest: $IS_LATEST"
+echo "Skip Git: $SKIP_GIT"
+
+# If SkipGit is true, don't modify repo
+if [ "$SKIP_GIT" = "true" ]; then
+    echo "SkipGit is true, skipping all git operations"
+    exit 0
+fi
 
 # Configure git
 git config user.name "github-actions[bot]"
