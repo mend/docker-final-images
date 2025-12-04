@@ -61,7 +61,7 @@ else
 fi
 
  # Create tag
-git tag -a $$ZIP_VERSION -m "Automated Tag for Release $ZIP_VERSION"
+git tag -a $ZIP_VERSION -m "Automated Tag for Release $ZIP_VERSION"
 git push origin --tags
 
 
