@@ -128,7 +128,8 @@ fi
 echo "Building agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip"
 cd ..
 # zip up the agent-4-github-enterprise-$ZIP_VERSION folder with SAST files included
-zip -r agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip agent-4-github-enterprise-$ZIP_VERSION
+mv agent-4-github-enterprise-$ZIP_VERSION agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt
+zip -r agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt
 
 # sanity check unzip to a new folder
 unzip -o agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt.zip -d agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt
