@@ -1,4 +1,4 @@
-FROM  054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-remediate:25.10.1.3-cs-beta
+FROM  054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-remediate:25.11.1
 
 # The containerbase supports custom user but Renovate requires ubuntu
 ARG USER_NAME=ubuntu
