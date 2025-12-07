@@ -2,13 +2,13 @@
 set -e
 
 ZIP_VERSION=$1
-SAST_SELF_CONTAINED_VERSION_PARAM=$2
+SAST_SELF_CONTAINED_VERSION=$2
 
 echo "Downloading production SAST files and replacing staging versions"
 echo "ZIP Version: $ZIP_VERSION"
 
-if [ -n "$SAST_SELF_CONTAINED_VERSION_PARAM" ]; then
-    echo "SAST Self-Contained Version (provided): $SAST_SELF_CONTAINED_VERSION_PARAM"
+if [ -n "$SAST_SELF_CONTAINED_VERSION" ]; then
+    echo "SAST Self-Contained Version (provided): $SAST_SELF_CONTAINED_VERSION"
 fi
 
 if [ -z "$ZIP_VERSION" ]; then
@@ -20,7 +20,7 @@ parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
 
-if [ -n "$SAST_SELF_CONTAINED_VERSION_PARAM" ]; then
+if [ -n "$SAST_SELF_CONTAINED_VERSION" ]; then
     # Priority 1: Use provided parameter
     echo "Using provided SAST version parameter: $SAST_SELF_CONTAINED_VERSION"
 else
