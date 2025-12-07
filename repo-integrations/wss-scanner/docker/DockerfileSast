@@ -1,4 +1,4 @@
-FROM  054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-scanner-sast:25.10.1.3-cs-beta
+FROM  054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-scanner-sast:25.11.1
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
@@ -9,28 +9,47 @@ ENV BASH_ENV=/usr/local/etc/env
 SHELL ["/bin/bash" , "-c"]
 
 # START OF FINAL IMAGE
-
-COPY self-contained-sast-25.10.3.tar.gz .
+COPY self-contained-sast-25.11.1.tar.gz .
 COPY mend /sast/bin/mend
 RUN chmod 0775 /sast/bin/mend
-
 ENV PATH="/sast/bin:${PATH}"
-
 RUN echo "Extracting Mend SAST artifacts"
 RUN mkdir -p ${USER_HOME}/.mend \
-    && tar -xzf self-contained-sast-25.10.3.tar.gz -C ${USER_HOME}/.mend \
+    && tar -xzf self-contained-sast-25.11.1.tar.gz -C ${USER_HOME}/.mend \
     && chown -R wss-scanner:wss-scanner ${USER_HOME}/.mend \
-    && rm self-contained-sast-25.10.3.tar.gz
+    && rm self-contained-sast-25.11.1.tar.gz
 
+# # Download the SAST CLI and set it in $PATH, can be replaced by:
+# #--build-arg SASTCLI=URL
+# RUN echo "Downloading latest Mend Unified CLI wrapper"
+# ARG SASTCLI=https://downloads.mend.io/cli/linux_amd64/mend
+# RUN curl -f $SASTCLI --create-dirs -o /sast/bin/mend && chmod 0775 /sast/bin/mend
+# ENV PATH=$PATH:/sast/bin
+# 
 ENV WS_SAST_SCAN_PREFIX=SAST_
 
+### copy folder
 COPY docker-image-scanner/ /
+# ┌────────────┬────────────┬───────────────────────────────────────────────────────────────────┐
+# │ Severity   │ Count      │ CVEs                                                              │
+# ├────────────┼────────────┼───────────────────────────────────────────────────────────────────┤
+# │ Critical   │ 1          │ CVE-2025-22871                                                    │
+# ├────────────┼────────────┼───────────────────────────────────────────────────────────────────┤
+# │ High       │ 8          │ CVE-2025-22874, CVE-2025-47912, CVE-2025-47907, CVE-2025-58187    │
+# │            │            │ CVE-2025-58188, CVE-2025-58183, CVE-2025-61724, CVE-2025-58186    │
+# └────────────┴────────────┴───────────────────────────────────────────────────────────────────┘
 
 RUN chmod 755 /start.sh
 RUN chgrp -R 0 ${USER_HOME} && chmod -R g=u ${USER_HOME}
 
 ENV SCM_SCANNER_HOME=/etc/usr/local/whitesource/scm-scanner
 RUN chmod -R ugo+rw ${SCM_SCANNER_HOME}
+# ┌────────────┬────────────┬─────────────────────────────────────────────────────────────────┐
+# │ Severity   │ Count      │ CVEs                                                            │
+# ├────────────┼────────────┼─────────────────────────────────────────────────────────────────┤
+# │ High       │ 7          │ CVE-2025-58056, CVE-2023-3894, CVE-2024-7254, CVE-2025-58057    │
+# │            │            │ CVE-2022-3510, CVE-2022-3509, CVE-2022-3171                     │
+# └────────────┴────────────┴─────────────────────────────────────────────────────────────────┘
 ENV LOG4J_FORMAT_MSG_NO_LOOKUPS=true
 ### Switch User ###
 ENV HOME ${USER_HOME}
@@ -43,7 +62,7 @@ ENV JDK_JAVA_OPTIONS "--add-opens java.base/java.util=ALL-UNNAMED --add-opens ja
 EXPOSE 9393
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-# Mend traceability labels
+# Mend traceability labels  
 LABEL io.mend.image.dockerfile.path=integration-new/github-scanner-parent/scm-packaging/src/assembly-staging/docker/Dockerfile
 LABEL org.opencontainers.image.source=https://github.com/whitesource/github-scanner
 
