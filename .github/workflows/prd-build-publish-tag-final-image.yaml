@@ -81,73 +81,11 @@ jobs:
         run: |
           ./bin/prd-upload-s3.sh "${{ github.event.inputs.ZipVersion }}"
 
-      - name: Git operations and production branch creation
+      - name: Git operations and Production branch creation
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # If SkipGit is true, don't modify repo
-          if [ "${{ github.event.inputs.SkipGit }}" = "true" ]; then
-            echo "SkipGit is true, skipping git operations"
-            exit 0
-          fi
-
-          # Set git config
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Checkout existing staging release branch (created by staging pipeline)
-          git checkout release/${{ github.event.inputs.ZipVersion }}
-
-          # Create production branch from staging release
-          git checkout -b production/${{ github.event.inputs.ZipVersion }}
-          git push origin production/${{ github.event.inputs.ZipVersion }}
-
-
-      - name: Finalize git operations
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # If SkipGit is true, don't modify repo
-          if [ "${{ github.event.inputs.SkipGit }}" = "true" ]; then
-            echo "SkipGit is true, skipping git finalization"
-            exit 0
-          fi
-
-          # Set git config
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Switch to production branch (should already be there)
-          git checkout production/${{ github.event.inputs.ZipVersion }}
-
-          # If files changed, add, commit and push
-          if [[ `git status --porcelain` ]]; then
-            echo "Changes detected, committing and pushing production changes."
-            git add .
-            git commit -m "Production version with mend/ prefix for ${{ github.event.inputs.ZipVersion }}"
-            git push
-          else
-            echo "No changes detected, skipping commit"
-          fi
-
-          # Create production tag
-          git tag -a ${{ github.event.inputs.ZipVersion }}-prod -m "Production Release ${{ github.event.inputs.ZipVersion }}"
-          git push origin --tags
-
-          # Create release from production branch
-          if [ "${{ github.event.inputs.IsLatest }}" = "false" ]; then
-            gh release create "${{ github.event.inputs.ZipVersion }}-prod" --latest=false --generate-notes --target production/${{ github.event.inputs.ZipVersion }} --title "Production Release ${{ github.event.inputs.ZipVersion }}"
-            echo "IsLatest is false, not merging production branch to main"
-            exit 0
-          else
-            gh release create "${{ github.event.inputs.ZipVersion }}-prod" --latest --generate-notes --target production/${{ github.event.inputs.ZipVersion }} --title "Production Release ${{ github.event.inputs.ZipVersion }}"
-          fi
-
-          # Merge PRODUCTION branch to main if IsLatest is true (customers get production version)
-          echo "IsLatest is true, merging production branch to main"
-          git checkout main
-          git merge production/${{ github.event.inputs.ZipVersion }} --commit --no-edit
-          git push
+          ./bin/prd-git-operations.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ github.event.inputs.SkipGit }}"
 
       - name: Send Slack notification
         env:
