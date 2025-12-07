@@ -34,8 +34,10 @@ if [ ! -f $appdockerfile ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $appdockerfile
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $appdockerfile
 cp $appdockerfile $appDockerfileTemplate
+
+
 
 echo "=== wss-ghe-app Dockerfile Content ==="
 cat $appDockerfileTemplate
@@ -53,7 +55,7 @@ if [ ! -f $scaScannerDockerfile ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfile
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfile
 cp $scaScannerDockerfile $scaScannerDockerfileTemplate
 
 echo "=== wss-scanner Dockerfile Content ==="
@@ -72,7 +74,7 @@ if [ ! -f $scaScannerDockerfilefull ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfilefull
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfilefull
 cp $scaScannerDockerfilefull $scaScannerDockerfilefullTemplate
 
 echo "=== wss-scanner Dockerfilefull Content ==="
@@ -101,7 +103,7 @@ if [ -n "$SAST_SELF_CONTAINED_VERSION_PARAM" ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $sastScannerDockerfile 
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $sastScannerDockerfile
 cp $sastScannerDockerfile $sastScannerDockerfileTemplate
 
 
@@ -121,7 +123,7 @@ if [ ! -f $remediateDockerfile ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $remediateDockerfile
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $remediateDockerfile
 cp $remediateDockerfile $remediateDockerfileTemplate
 
 echo "=== wss-remediate Dockerfile Content ==="
