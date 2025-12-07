@@ -19,36 +19,14 @@ fi
 parent_path=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
 cd "$parent_path"
 
-# Determine SAST version with priority order:
-# 1. Use provided parameter if available
-# 2. Auto-detect from staging files
-# 3. Fallback to ZIP_VERSION
-SAST_SELF_CONTAINED_VERSION=""
 
 if [ -n "$SAST_SELF_CONTAINED_VERSION_PARAM" ]; then
     # Priority 1: Use provided parameter
-    SAST_SELF_CONTAINED_VERSION=$SAST_SELF_CONTAINED_VERSION_PARAM
     echo "Using provided SAST version parameter: $SAST_SELF_CONTAINED_VERSION"
 else
-    # Priority 2: Auto-detect from staging files
-    echo "No SAST version parameter provided, attempting auto-detection from staging files..."
-
-    # Look for existing SAST files in the extracted staging package to determine version
-    if [ -d ../tmp/agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt/wss-scanner/docker ]; then
-        # Check for existing SAST tar file to get version
-        SAST_FILE=$(find ../tmp/agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt/wss-scanner/docker -name "self-contained-sast-*.tar.gz" 2>/dev/null | head -1)
-        if [ -n "$SAST_FILE" ]; then
-            # Extract version from filename: self-contained-sast-X.Y.Z.tar.gz
-            SAST_SELF_CONTAINED_VERSION=$(basename "$SAST_FILE" | sed 's/self-contained-sast-\(.*\)\.tar\.gz/\1/')
-            echo "Auto-detected SAST version from staging files: $SAST_SELF_CONTAINED_VERSION"
-        fi
-    fi
-
-    # Priority 3: Fallback to ZIP_VERSION if auto-detection failed
-    if [ -z "$SAST_SELF_CONTAINED_VERSION" ]; then
-        SAST_SELF_CONTAINED_VERSION=$ZIP_VERSION
-        echo "Could not auto-detect SAST version, using ZIP version as fallback: $SAST_SELF_CONTAINED_VERSION"
-    fi
+    # Priority 2: Fallback to ZIP_VERSION
+    SAST_SELF_CONTAINED_VERSION=$ZIP_VERSION
+    echo "Could not auto-detect SAST version, using ZIP version as fallback: $SAST_SELF_CONTAINED_VERSION"
 fi
 
 echo "Using SAST Self-Contained Version: $SAST_SELF_CONTAINED_VERSION"
