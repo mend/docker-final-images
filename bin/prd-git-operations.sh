@@ -44,6 +44,7 @@ PRODUCTION_BRANCH="production/$ZIP_VERSION"
 echo "Creating Production branch: $PRODUCTION_BRANCH"
 
 git checkout $STAGING_BRANCH
+git pull origin $STAGING_BRANCH
 git checkout -b $PRODUCTION_BRANCH
 git push --set-upstream origin $PRODUCTION_BRANCH
 
