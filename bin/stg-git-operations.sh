@@ -69,6 +69,7 @@ git push origin --tags
 if [ "$IS_LATEST" = "true" ]; then
     echo "IsLatest is true, merging changes to develop branch"
     git checkout develop
+    git pull origin develop
     git merge $RELEASE_BRANCH --no-ff -m "feat: Merge staging release $ZIP_VERSION"
     git push origin develop
     echo "Successfully merged release branch to develop"

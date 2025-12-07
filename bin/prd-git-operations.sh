@@ -67,6 +67,7 @@ git push origin --tags
 if [ "$IS_LATEST" = "true" ]; then
     echo "IsLatest is true, merging PRODUCTION branch to main"
     git checkout main
+    git pull origin main
     git merge $PRODUCTION_BRANCH --no-ff -m "feat: Merge production branch $ZIP_VERSION to main"
     git push origin main
     echo "Successfully merged production release branch to main"
