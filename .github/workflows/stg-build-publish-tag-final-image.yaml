@@ -70,9 +70,9 @@ jobs:
         run: |
           ./bin/stg-copy.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}" "${{ github.event.inputs.PreviousTag }}"
 
-#      - name: Build and test Docker images
-#        run: |
-#          ./bin/stg-build.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
+      - name: Build and test Docker images
+        run: |
+          ./bin/stg-build.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
 #
 #      - name: Publish images to Staging ECR
 #        env:
