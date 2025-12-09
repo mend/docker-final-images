@@ -34,8 +34,10 @@ if [ ! -f $appdockerfile ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $appdockerfile
 cp $appdockerfile $appDockerfileTemplate
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $appDockerfileTemplate
+
+
 
 echo "=== wss-ghe-app Dockerfile Content ==="
 cat $appDockerfileTemplate
@@ -53,8 +55,8 @@ if [ ! -f $scaScannerDockerfile ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfile
 cp $scaScannerDockerfile $scaScannerDockerfileTemplate
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfileTemplate
 
 echo "=== wss-scanner Dockerfile Content ==="
 cat $scaScannerDockerfileTemplate
@@ -72,8 +74,8 @@ if [ ! -f $scaScannerDockerfilefull ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfilefull
 cp $scaScannerDockerfilefull $scaScannerDockerfilefullTemplate
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $scaScannerDockerfilefullTemplate
 
 echo "=== wss-scanner Dockerfilefull Content ==="
 cat $scaScannerDockerfilefullTemplate
@@ -90,38 +92,20 @@ if [ ! -f $sastScannerDockerfile ]; then
   exit 1
 fi
 
-# Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
-cp $sastScannerDockerfile $sastScannerDockerfileTemplate
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $sastScannerDockerfileTemplate
-
 # Copy production SAST files to repo-integrations where Docker builds happen
 echo "Copying production SAST files to repo-integrations directory"
-
-# Find and copy the self-contained SAST tar.gz file (whatever version is in the prebuilt package)
-SAST_TAR_FILE=$(find tmp/agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt/wss-scanner/docker -name "self-contained-sast-*.tar.gz" 2>/dev/null | head -1)
-if [ -n "$SAST_TAR_FILE" ]; then
-    echo "Copying SAST tar file: $(basename $SAST_TAR_FILE)"
-    cp "$SAST_TAR_FILE" repo-integrations/wss-scanner/docker/
-else
-    echo "Warning: No self-contained SAST tar.gz file found in prebuilt package"
-fi
-
-# Copy the mend binary if it exists
-MEND_BINARY="tmp/agent-4-github-enterprise-$ZIP_VERSION-with-prebuilt/wss-scanner/docker/mend"
-if [ -f "$MEND_BINARY" ]; then
-    echo "Copying mend binary"
-    cp "$MEND_BINARY" repo-integrations/wss-scanner/docker/
-    chmod +x repo-integrations/wss-scanner/docker/mend
-else
-    echo "Warning: No mend binary found in prebuilt package"
-fi
 
 # Update SAST version references if SAST version is provided
 if [ -n "$SAST_SELF_CONTAINED_VERSION_PARAM" ]; then
     echo "Updating SAST version references in DockerfileSast from auto-detected to: $SAST_SELF_CONTAINED_VERSION_PARAM"
     # Replace any existing SAST version references with the provided version
-    sed -i "s|self-contained-sast-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*|self-contained-sast-$SAST_SELF_CONTAINED_VERSION_PARAM|g" $sastScannerDockerfileTemplate
+    sed -i "s|self-contained-sast-[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*|self-contained-sast-$SAST_SELF_CONTAINED_VERSION_PARAM|g" $sastScannerDockerfile
 fi
+
+# Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $sastScannerDockerfile
+cp $sastScannerDockerfile $sastScannerDockerfileTemplate
+
 
 echo "=== wss-scanner DockerfileSast Content ==="
 cat $sastScannerDockerfileTemplate
@@ -139,8 +123,8 @@ if [ ! -f $remediateDockerfile ]; then
 fi
 
 # Copy the Dockerfile from pre-release and replace ECR with mend/ prefix
+sed -i "s|FROM  [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $remediateDockerfile
 cp $remediateDockerfile $remediateDockerfileTemplate
-sed -i "s|FROM [0-9]*\.dkr\.ecr\..*\.amazonaws\.com/base-repo-|FROM mend/base-repo-|g" $remediateDockerfileTemplate
 
 echo "=== wss-remediate Dockerfile Content ==="
 cat $remediateDockerfileTemplate
