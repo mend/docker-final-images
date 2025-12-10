@@ -1,4 +1,4 @@
-FROM  054331651301.dkr.ecr.us-east-1.amazonaws.com/base-repo-scanner:25.11.1-full
+FROM mend/base-repo-scanner:25.11.1-full
 
 ARG USER_NAME=wss-scanner
 ARG USER_ID=1000
