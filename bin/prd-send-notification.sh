@@ -5,6 +5,7 @@ ZIP_VERSION=$1
 IS_LATEST=$2
 JOB_STATUS=$3
 GITHUB_ACTION_URL=$4
+SAST_SELF_CONTAINED_VERSION=$5
 
 echo "Sending Slack notification to production channel"
 echo "ZIP Version: $ZIP_VERSION"
@@ -37,22 +38,20 @@ if [ -z "$SLACK_WEBHOOK_URL" ]; then
   exit 0
 fi
 
+if [ -n "$SAST_SELF_CONTAINED_VERSION" ]; then
+    echo "SAST Self-Contained Version (provided): $SAST_SELF_CONTAINED_VERSION"
+fi
+
 # Mask the webhook URL in GitHub Actions logs
 echo "::add-mask::$SLACK_WEBHOOK_URL"
 
-# Auto-detect SAST version from staging files
-SAST_SELF_CONTAINED_VERSION=""
-if [ -d "tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker" ]; then
-    SAST_FILE=$(find tmp/agent-4-github-enterprise-$ZIP_VERSION/wss-scanner/docker -name "self-contained-sast-*.tar.gz" 2>/dev/null | head -1)
-    if [ -n "$SAST_FILE" ]; then
-        SAST_SELF_CONTAINED_VERSION=$(basename "$SAST_FILE" | sed 's/self-contained-sast-\(.*\)\.tar\.gz/\1/')
-        echo "Auto-detected SAST version: $SAST_SELF_CONTAINED_VERSION"
-    fi
-fi
-
-if [ -z "$SAST_SELF_CONTAINED_VERSION" ]; then
+if [ -n "$SAST_SELF_CONTAINED_VERSION" ]; then
+    # Priority 1: Use provided parameter
+    echo "Using provided SAST version parameter: $SAST_SELF_CONTAINED_VERSION"
+else
+    # Priority 2: Fallback to ZIP_VERSION
     SAST_SELF_CONTAINED_VERSION=$ZIP_VERSION
-    echo "Using ZIP version as SAST fallback: $SAST_SELF_CONTAINED_VERSION"
+    echo "Could not auto-detect SAST version, using ZIP version as fallback: $SAST_SELF_CONTAINED_VERSION"
 fi
 
 # Determine branch info

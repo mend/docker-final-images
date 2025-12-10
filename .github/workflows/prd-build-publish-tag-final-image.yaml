@@ -91,4 +91,4 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.PRD_SLACK_WEBHOOK_URL }}
         run: |
-          ./bin/prd-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ job.status }}" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          ./bin/prd-send-notification.sh "${{ github.event.inputs.ZipVersion }}" "${{ github.event.inputs.IsLatest }}" "${{ job.status }}" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" "${{ github.event.inputs.SastSelfContainedVersion }}"
